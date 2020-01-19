@@ -1,6 +1,7 @@
 - const cardWidth = 128;
 - const cardHeight = 178;
 - const cardGap = 8;
+- const circleRadius = 24;
 
 html(lang="en")
     head
@@ -11,18 +12,30 @@ html(lang="en")
         script(src="js/index.js" type="module")
         title Shenzhen Solitaire
     body
-        svg#table(xmlns="http://www.w3.org/2000/svg")
-            each val, i in [,,,]
+        svg#table(viewBox=`${-cardGap} -1000 ${(cardWidth + cardGap) * 8 + cardGap} ${(cardWidth * 2) + cardGap * 8}`)
+            g.splash-screen(transform="translate(0,-1000)")
+                text#start-game-btn Hey there!
+
+            each _, i in new Array(3)
                 g.card-slot.card-slot-for-dragon(transform=`translate(${(cardWidth + cardGap) * i},0)`)
-                    rect(x=0 y=0 width=cardWidth height=cardHeight rx=5 stroke=black fill=none)
+                    rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
             
             g.card-slot.card-slot-for-flower(transform=`translate(${(cardWidth + cardGap * 2) * 3},0)`)
-                    rect(x=0 y=0 width=cardWidth height=cardHeight rx=5 stroke=black fill=none)
+                rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
 
-            each val, i in [,,,]
+            g.dragon-summoning-btns(transform=`translate(${(cardWidth + cardGap * 2) * 4},${circleRadius + cardGap})`)
+                each color, i in ['black', 'green', 'red']
+                    circle(
+                        cx=circleRadius 
+                        cy=((circleRadius * 2 + cardGap) * i) 
+                        r=circleRadius 
+                        data-color=color
+                        class="dragon-summoning-btn")
+
+            each _, i in new Array(3)
                 g.card-slot.card-slot-for-collection(transform=`translate(${(cardWidth + cardGap) * (i + 5)},0)`)
-                    rect(x=0 y=0 width=cardWidth height=cardHeight rx=5 stroke=black fill=none)
+                    rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
 
-            each val, i in [,,,,,,,,]
-                g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap * 4})`)
-                    rect(x=0 y=0 width=cardWidth height=cardHeight rx=5 stroke=black fill=none)
+            each _, i in new Array(8)
+                g.card-slot.card-slot-for-stacking(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap * 4})`)
+                    rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)

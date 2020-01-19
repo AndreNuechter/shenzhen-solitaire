@@ -1,18 +1,18 @@
 /* globals window */
 
-const [card] = window.document.getElementsByClassName('card-slot');
+import { startGameBtn, table } from './dom-selections.js';
+import { cards, dealCards } from './cards.js';
 
-card.onpointerdown = ({ x: x1, y: y1 }) => {
-    // FIXME this resets on ea drag
-    const x = +card.firstElementChild.getAttribute('x');
-    const y = +card.firstElementChild.getAttribute('y');
+startGameBtn.onclick = removeSplashScreen;
+window.addEventListener('DOMContentLoaded', () => {
+    removeSplashScreen();
+    dealCards(cards);
+});
 
-    window.onpointermove = ({ x: x2, y: y2 }) => {
-        card.setAttribute('transform', `translate(${[
-            x + (x2 - x1),
-            y + (y2 - y1)
-        ].join(',')})`);
-    };
-};
+// TODO import this
+function removeSplashScreen() {
+    const init = table.getAttribute('viewBox');
+    table.setAttribute('viewBox', init.replace('-1000', '232')); // TODO the 232 is to have upper edge look ok...calculate this
+}
 
-window.onpointerup = () => { window.onpointermove = null; };
+// window.onpointerup = () => { window.onpointermove = null; };

@@ -1,6 +1,7 @@
 body,
 html {
     height: 100%;
+    width: 100%;
     padding: 0;
     margin: 0;
     background: brown;
@@ -19,13 +20,23 @@ html {
     background: forestgreen;
 }
 
-.card-slot {
-    rect {
-        fill: none;
-        stroke: black;
-    }
+.card {
+    fill: white;
+    stroke: black;
 
-    text {
-        fill: black;
+    &-slot {
+        rect {
+            fill: none;
+            stroke: black;
+        }
+
+        text {
+            fill: black;
+        }
     }
+}
+
+.dragon-summoning-btn {
+    fill: silver;
+    stroke: black;
 }
