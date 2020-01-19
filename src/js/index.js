@@ -1,14 +1,17 @@
 /* globals window */
 
-const [card] = window.document.getElementsByTagName('rect');
+const [card] = window.document.getElementsByClassName('card-slot');
 
 card.onpointerdown = ({ x: x1, y: y1 }) => {
-    const x = +card.getAttribute('x');
-    const y = +card.getAttribute('y');
+    // FIXME this resets on ea drag
+    const x = +card.firstElementChild.getAttribute('x');
+    const y = +card.firstElementChild.getAttribute('y');
 
     window.onpointermove = ({ x: x2, y: y2 }) => {
-        card.setAttribute('x', x + (x2 - x1));
-        card.setAttribute('y', y + (y2 - y1));
+        card.setAttribute('transform', `translate(${[
+            x + (x2 - x1),
+            y + (y2 - y1)
+        ].join(',')})`);
     };
 };
 
