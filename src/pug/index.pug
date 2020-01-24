@@ -12,7 +12,7 @@ html(lang="en")
         script(src="js/index.js" type="module")
         title Shenzhen Solitaire
     body
-        svg#table(viewBox=`${-cardGap} -1000 ${(cardWidth + cardGap) * 8 + cardGap} ${(cardWidth * 2) + cardGap * 8}`)
+        svg#table(preserveAspectRatio="xMinYMin meet" viewBox=`${-cardGap} -1000 ${(cardWidth + cardGap) * 8 + cardGap} ${'732'}`)
             g.splash-screen(transform="translate(0,-1000)")
                 text#start-game-btn Hey there!
 

@@ -19,7 +19,7 @@ const proverbs = [
     'A pack of cards is the devil’s prayer-book.',
     'Rich gamblers and old trumpeters are rare.',
     'Luck never gives; it only lends.',
-    'Before you Gamble: Know the Rules, The Stakes and predetermine The Quitting Time'
+    'Before you gamble: Know the rules, the stakes and predetermine the quitting time.'
 ];
 
 const htmlRoot = 'src/pug/index.pug';

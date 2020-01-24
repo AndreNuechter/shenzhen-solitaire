@@ -4,7 +4,7 @@ html {
     width: 100%;
     padding: 0;
     margin: 0;
-    background: brown;
+    background: rgb(88, 52, 52);
     overflow: hidden;
 
     *,
@@ -15,28 +15,40 @@ html {
 }
 
 #table {
-    height: 100%;
-    width: 100%;
+    height: auto;
+    width: 1088px;
+    display: block;
+    margin: 0 auto;
+    transform: translateY(15%);
     background: forestgreen;
+    border: 3px solid black;
 }
 
 .card {
     fill: white;
     stroke: black;
+    stroke-width: 1;
+    pointer-events: none; // FIXME this will not work for groups of cards
+
+    &:last-of-type {
+        pointer-events: all;
+    }
+
+    text {
+        font-family: Arial, Helvetica, sans-serif;
+        fill: black;
+        user-select: none;
+    }
 
     &-slot {
-        rect {
-            fill: none;
-            stroke: black;
-        }
-
-        text {
-            fill: black;
-        }
+        fill: none;
+        stroke: black;
+        stroke-width: 3;
     }
 }
 
 .dragon-summoning-btn {
     fill: silver;
     stroke: black;
+    stroke-width: 3;
 }
