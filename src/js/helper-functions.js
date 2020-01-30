@@ -2,7 +2,8 @@ const exceptions = ['checked', 'textContent', 'data', 'onpointerdown', 'onpointe
 
 export {
     configClone,
-    configElement
+    configElement,
+    indexOfNode
 };
 
 /**
@@ -31,3 +32,5 @@ function configElement(element, keyValPairs) {
 
     return element;
 }
+
+function indexOfNode(nodeList, node) { return Array.prototype.indexOf.call(nodeList, node); }

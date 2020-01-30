@@ -1,10 +1,15 @@
+:root {
+    --border-color: rgba(122, 87, 119, 0.7);
+}
+
 body,
 html {
     height: 100%;
     width: 100%;
     padding: 0;
     margin: 0;
-    background: rgb(88, 52, 52);
+    background: repeating-linear-gradient(transparent, red 40px),
+        repeating-linear-gradient(0.25turn, gold, red 40px);
     overflow: hidden;
 
     *,
@@ -19,36 +24,44 @@ html {
     width: 1088px;
     display: block;
     margin: 0 auto;
-    transform: translateY(15%);
+    transform: translateY(10%);
     background: forestgreen;
-    border: 3px solid black;
+    border: 3px solid var(--border-color);
+    border-top: 24px solid var(--border-color);
+    border-bottom: 24px solid var(--border-color);
+    user-select: none;
 }
 
 .card {
     fill: white;
-    stroke: black;
+    stroke: dimgrey;
     stroke-width: 1;
-    pointer-events: none; // FIXME this will not work for groups of cards
-
-    &:last-of-type {
-        pointer-events: all;
-    }
 
     text {
         font-family: Arial, Helvetica, sans-serif;
-        fill: black;
         user-select: none;
+        stroke: none;
     }
 
     &-slot {
         fill: none;
         stroke: black;
-        stroke-width: 3;
+        stroke-width: 1;
+    }
+
+    &--frozen {
+        pointer-events: none;
     }
 }
 
 .dragon-summoning-btn {
-    fill: silver;
-    stroke: black;
-    stroke-width: 3;
+    fill: url('#myGradient');
+    stroke: grey;
+    stroke-width: 1;
+    cursor: pointer;
+
+    text {
+        stroke: none;
+        transform: translate(-6px, 6px);
+    }
 }

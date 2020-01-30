@@ -9,33 +9,46 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
         link(rel="stylesheet", href="css/index.css")
+        // build:js
         script(src="js/index.js" type="module")
+        script(src="js/card-slots.js" type="module")
+        // endbuild
         title Shenzhen Solitaire
     body
         svg#table(preserveAspectRatio="xMinYMin meet" viewBox=`${-cardGap} -1000 ${(cardWidth + cardGap) * 8 + cardGap} ${'732'}`)
-            g.splash-screen(transform="translate(0,-1000)")
+            g#splash-screen(transform="translate(0,-1000)")
                 text#start-game-btn Hey there!
 
             each _, i in new Array(3)
-                g.card-slot.card-slot-for-dragon(transform=`translate(${(cardWidth + cardGap) * i},0)`)
+                g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},0)` data-slot-type="dragon")
                     rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
             
-            g.card-slot.card-slot-for-flower(transform=`translate(${(cardWidth + cardGap * 2) * 3},0)`)
+            g.card-slot(transform=`translate(${(cardWidth + cardGap * 2) * 3},0)` data-slot-type="flower")
                 rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
 
-            g.dragon-summoning-btns(transform=`translate(${(cardWidth + cardGap * 2) * 4},${circleRadius + cardGap})`)
+            g#dragon-summoning-btns(transform=`translate(${(cardWidth + cardGap * 2) * 4},${circleRadius + cardGap})`)
                 each color, i in ['black', 'green', 'red']
-                    circle(
-                        cx=circleRadius 
-                        cy=((circleRadius * 2 + cardGap) * i) 
-                        r=circleRadius 
-                        data-color=color
-                        class="dragon-summoning-btn")
+                    g.dragon-summoning-btn(data-color=color)
+                        circle(
+                            cx=circleRadius 
+                            cy=((circleRadius * 2 + cardGap) * i) 
+                            r=circleRadius)
+                        text(fill=color
+                            x=circleRadius 
+                            y=((circleRadius * 2 + cardGap) * i)) Ω
 
             each _, i in new Array(3)
-                g.card-slot.card-slot-for-collection(transform=`translate(${(cardWidth + cardGap) * (i + 5)},0)`)
+                g.card-slot(transform=`translate(${(cardWidth + cardGap) * (i + 5)},0)` data-slot-type="collection")
                     rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
 
             each _, i in new Array(8)
-                g.card-slot.card-slot-for-stacking(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap * 4})`)
+                g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap * 4})` data-slot-type="stacking")
                     rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
+
+        svg(width="0" height="0" style="position: absolute")
+            defs
+                linearGradient#myGradient(gradientTransform="rotate(90)")
+                    stop(offset="5%" stop-color="grey")
+                    stop(offset="95%" stop-color="whitesmoke")
+                filter#blur
+                    feGaussianBlur(stdDeviation="0.5")

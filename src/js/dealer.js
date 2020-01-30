@@ -1,9 +1,14 @@
-/* globals MutationObserver, window */
+/* globals window */
 
-import { stackSlots, table } from './dom-selections.js';
-import { cardGap } from './constants.js';
+import {
+    cardSlots,
+    stackSlots,
+    table,
+    dragonSlots
+} from './dom-selections.js';
+import { group } from './dom-creations.js';
+import { indexOfNode } from './helper-functions.js';
 
-const getTranslateString = (x, y) => `translate(${x},${y})`;
 const shuffleCards = (deck) => {
     // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
     for (let i = deck.length - 1; i > 0; i -= 1) {
@@ -12,60 +17,114 @@ const shuffleCards = (deck) => {
     }
     return deck;
 };
-const translateNode = (node, offset) => node.setAttribute('transform', `translate(0,${offset * cardGap * 2})`);
+const getTranslateString = (x, y) => `translate(${x},${y})`;
+const isOutOfOrder = ({ dataset: { color, value } }, i, arr) => i < (arr.length - 1)
+    && (+arr[i + 1].dataset.value !== value - 1 || arr[i + 1].dataset.color === color);
+const stackRules = {
+    dragon: (movedSubStack, slot) => movedSubStack.children.length === 1
+        && slot.children.length === 1,
+    flower: ({ children: [card] }) => card.dataset.value === '10',
+    collection: ({ children: movedCards }, { children: collected }) => {
+        const dataOfFirstMoved = movedCards[0].dataset;
+        const dataOfLastCollected = collected[collected.length - 1].dataset;
 
-stackSlots.forEach((slot) => {
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach(({ addedNodes }, offset) => {
-            if (addedNodes.length) {
-                addedNodes.forEach(node => translateNode(node, offset));
-            }
-        });
-    });
+        return movedCards.length === 1
+            && ((collected.length === 1 && dataOfFirstMoved.value === '0')
+                || (+dataOfFirstMoved.value === (+dataOfLastCollected.value + 1)
+                    && dataOfFirstMoved.color === dataOfLastCollected.color));
+    },
+    stacking: ({ children: [{ dataset: dataOfBottomMoved }] }, { children: stacked }) => {
+        const dataOfTopStacked = stacked[stacked.length - 1].dataset;
 
-    observer.observe(slot, { childList: true });
-});
+        return stacked.length === 1
+            || (+dataOfTopStacked.value !== 9
+                && +dataOfBottomMoved.value === +dataOfTopStacked.value - 1
+                && dataOfBottomMoved.color !== dataOfTopStacked.color);
+    }
+};
+const canBeMovedHere = (movedSubStack, slot) => stackRules[slot.dataset.slotType](movedSubStack, slot);
+// https://stackoverflow.com/questions/12066870/how-to-check-if-an-element-is-overlapping-other-elements
+const detectOverlap = (rect1, rect2) => !(rect1.right < rect2.left
+    || rect1.left > rect2.right
+    || rect1.bottom < rect2.top
+    || rect1.top > rect2.bottom);
 
 export {
     dealCards,
     moveCard,
-    removeSplashScreen
+    removeSplashScreen,
+    summonDragons
 };
 
 function dealCards(deck) {
     shuffleCards(deck)
-        .forEach(({ domNode }, i) => stackSlots[i % 8].append(domNode));
+        .forEach((card, i) => stackSlots[i % 8].append(card));
 }
 
 function moveCard({ target, x: x1, y: y1 }) {
     if (!target.parentNode.classList.contains('card')) return;
 
     const card = target.parentNode;
-    const cardPos = card.getAttribute('transform');
     const cardSlot = card.parentNode;
     const cardSlotPos = cardSlot.getAttribute('transform');
+    const cards = [...cardSlot.children]
+        .slice(indexOfNode(cardSlot.children, card));
 
-    // take card out of group and append after last so it is above all stacks,
-    // needs translation on form
-    card.setAttribute('transform', cardSlotPos + cardPos);
-    table.append(card);
+    if (cards.some(isOutOfOrder)) return;
 
-    window.onpointermove = ({ x: x2, y: y2 }) => {
-        card.setAttribute('transform', cardSlotPos + cardPos + getTranslateString(
+    const movedSubStack = group.cloneNode(false);
+    movedSubStack.setAttribute('transform', cardSlotPos);
+    movedSubStack.append(...cards);
+    table.append(movedSubStack);
+
+    const cb = ({ x: x2, y: y2 }) => {
+        movedSubStack.setAttribute('transform', cardSlotPos + getTranslateString(
             (x2 - x1),
             (y2 - y1)
         ));
     };
 
-    window.onpointerup = () => {
-        card.setAttribute('transform', cardPos);
-        cardSlot.append(card);
-        // TODO check if above valid spot
-        window.onpointermove = null;
-    };
+    window.addEventListener('pointermove', cb, { passive: true });
+    window.addEventListener('pointerup', () => {
+        const boundinRectsOfSlots = cardSlots
+            .map(slot => [slot, slot.getBoundingClientRect()]);
+        const boundingRectOfMoved = movedSubStack.getBoundingClientRect();
+        const overlapping = boundinRectsOfSlots
+            .find(([slot, rect]) => detectOverlap(boundingRectOfMoved, rect)
+                && canBeMovedHere(movedSubStack, slot));
+        const targetSlot = overlapping ? overlapping[0] : cardSlot;
+
+        cards.forEach(c => targetSlot.append(c));
+        movedSubStack.remove();
+        window.removeEventListener('pointermove', cb);
+    }, { once: true });
 }
 
 function removeSplashScreen() {
     const init = table.getAttribute('viewBox');
-    table.setAttribute('viewBox', init.replace('-1000', '-8'));
+    table.setAttribute('viewBox', init.replace(/^(-?\d+) -?\d+/, '$1 -8'));
+}
+
+function summonDragons({ target }) {
+    const btn = target.closest('.dragon-summoning-btn');
+
+    if (!btn) return;
+
+    const { color: btnColor } = btn.dataset;
+    const dragons = [...stackSlots, ...dragonSlots].reduce((arr, { children: cards }) => {
+        const { color: cardColor, value } = cards[cards.length - 1].dataset;
+
+        if (cardColor === btnColor && value === '9') {
+            arr.push(cards[cards.length - 1]);
+        }
+
+        return arr;
+    }, []);
+    const freeDragonSlots = dragonSlots.filter(({ children: cards }) => cards.length === 1
+        || (cards[1].dataset.value === '9' && cards[1].dataset.color === btnColor));
+
+    if (dragons.length === 4 && freeDragonSlots.length) {
+        freeDragonSlots[0].append(...dragons);
+        freeDragonSlots[0].style.pointerEvents = 'none';
+    }
 }

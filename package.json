@@ -1,7 +1,11 @@
 {
     "name": "shenzhen-solitaire",
     "version": "1.0.0",
-    "description": "A version of the card-game solitaire.",
+    "description": "A version of the popular card-game.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AndreNuechter/shenzhen-solitaire.git"
+    },
     "main": "gulpfile.js",
     "author": "AndreNuechter",
     "license": "MIT",
