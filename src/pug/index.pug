@@ -15,10 +15,7 @@ html(lang="en")
         // endbuild
         title Shenzhen Solitaire
     body
-        svg#table(preserveAspectRatio="xMinYMin meet" viewBox=`${-cardGap} -1000 ${(cardWidth + cardGap) * 8 + cardGap} ${'732'}`)
-            g#splash-screen(transform="translate(0,-1000)")
-                text#start-game-btn Hey there!
-
+        svg#table(preserveAspectRatio="xMinYMin meet" viewBox=`${-cardGap} ${-cardGap} ${(cardWidth + cardGap) * 8 + cardGap} ${'732'}`)
             each _, i in new Array(3)
                 g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},0)` data-slot-type="dragon")
                     rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)

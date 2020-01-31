@@ -6,7 +6,6 @@ const dragonSlots = [...document.querySelectorAll('[data-slot-type="dragon"]')];
 const dragonSummoningBtns = document.getElementById('dragon-summoning-btns');
 const flowerSlot = document.querySelector('[data-slot-type="flower"]');
 const stackSlots = [...document.querySelectorAll('[data-slot-type="stacking"]')];
-const startGameBtn = document.getElementById('start-game-btn');
 const table = document.getElementById('table');
 
 export {
@@ -16,6 +15,5 @@ export {
     dragonSummoningBtns,
     flowerSlot,
     stackSlots,
-    startGameBtn,
     table
 };

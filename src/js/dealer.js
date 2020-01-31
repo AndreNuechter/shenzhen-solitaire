@@ -52,7 +52,6 @@ const detectOverlap = (rect1, rect2) => !(rect1.right < rect2.left
 export {
     dealCards,
     moveCard,
-    removeSplashScreen,
     summonDragons
 };
 
@@ -98,11 +97,6 @@ function moveCard({ target, x: x1, y: y1 }) {
         movedSubStack.remove();
         window.removeEventListener('pointermove', cb);
     }, { once: true });
-}
-
-function removeSplashScreen() {
-    const init = table.getAttribute('viewBox');
-    table.setAttribute('viewBox', init.replace(/^(-?\d+) -?\d+/, '$1 -8'));
 }
 
 function summonDragons({ target }) {
