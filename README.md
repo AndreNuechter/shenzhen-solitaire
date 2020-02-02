@@ -1,6 +1,8 @@
 # Shenzhen Solitaire
 
-A variant of the popular card-game. Play it in the [browser](https://andrenuechter.github.io/shenzhen-solitaire/).
+A variant of the popular card-game, introduced in the fantastic [Shenzhen I/O](http://www.zachtronics.com/shenzhen-io/).
+
+You can play it in the [browser](https://andrenuechter.github.io/shenzhen-solitaire/).
 
 ## Rules
 
