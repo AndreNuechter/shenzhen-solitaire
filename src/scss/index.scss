@@ -19,12 +19,35 @@ html {
     }
 }
 
+g[data-color="black"] {
+    text {
+        fill: black;
+    }
+}
+
+g[data-color="green"] {
+    text {
+        fill: green;
+    }
+}
+
+g[data-color="red"] {
+    text {
+        fill: red;
+    }
+}
+
+g[data-color=""] {
+    text {
+        fill: purple;
+    }
+}
+
 #table {
     height: auto;
     width: 1088px;
     display: block;
     margin: 0 auto;
-    transform: translateY(10%);
     background: forestgreen;
     border: 3px solid var(--border-color);
     border-top: 24px solid var(--border-color);
@@ -37,6 +60,11 @@ html {
     stroke: dimgrey;
     stroke-width: 1;
     stroke-dasharray: 0;
+
+    rect {
+        width: 128px;
+        height: 178px;
+    }
 
     text {
         font-family: Arial, Helvetica, sans-serif;
@@ -55,6 +83,11 @@ html {
     stroke-width: 1;
     stroke-dasharray: 2 4;
     stroke-linecap: round;
+
+    rect {
+        width: 128px;
+        height: 178px;
+    }
 }
 
 .dragon-summoning-btn {

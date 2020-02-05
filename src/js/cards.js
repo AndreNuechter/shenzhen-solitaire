@@ -23,7 +23,6 @@ const cardTemplate = (color, value) => {
         if (value === 9) return symbols.dragon;
         return symbols.flower;
     })();
-    cardFace.setAttribute('fill', color || 'purple');
     card.append(cardBoard, cardFace);
     Object.assign(card.dataset, { color, value });
     return card;

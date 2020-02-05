@@ -8,6 +8,7 @@ import {
 } from './dom-selections.js';
 import { group } from './dom-creations.js';
 import { indexOfNode } from './helper-functions.js';
+import { onTouchDevice } from './constants.js';
 
 const shuffleCards = (deck) => {
     // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -76,15 +77,27 @@ function moveCard({ target, x: x1, y: y1 }) {
     movedSubStack.append(...cards);
     table.append(movedSubStack);
 
-    const cb = ({ x: x2, y: y2 }) => {
-        movedSubStack.setAttribute('transform', cardSlotPos + getTranslateString(
-            (x2 - x1),
-            (y2 - y1)
-        ));
-    };
+    let cb;
 
-    window.addEventListener('pointermove', cb, { passive: true });
-    window.addEventListener('pointerup', () => {
+    if (onTouchDevice) {
+        cb = ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
+            movedSubStack.setAttribute('transform', cardSlotPos + getTranslateString(
+                (x2 - x1),
+                (y2 - y1)
+            ));
+        };
+        window.addEventListener('touchmove', cb, { passive: true });
+    } else {
+        cb = ({ x: x2, y: y2 }) => {
+            movedSubStack.setAttribute('transform', cardSlotPos + getTranslateString(
+                (x2 - x1),
+                (y2 - y1)
+            ));
+        };
+        window.addEventListener('pointermove', cb, { passive: true });
+    }
+
+    window.addEventListener(onTouchDevice ? 'touchend' : 'pointerup', () => {
         const boundinRectsOfSlots = cardSlots
             .map(slot => [slot, slot.getBoundingClientRect()]);
         const boundingRectOfMoved = movedSubStack.getBoundingClientRect();
@@ -95,7 +108,7 @@ function moveCard({ target, x: x1, y: y1 }) {
 
         cards.forEach(c => targetSlot.append(c));
         movedSubStack.remove();
-        window.removeEventListener('pointermove', cb);
+        window.removeEventListener(onTouchDevice ? 'touchmove' : 'pointermove', cb);
     }, { once: true });
 }
 

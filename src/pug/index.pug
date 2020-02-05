@@ -6,7 +6,7 @@
 html(lang="en")
     head
         meta(charset="UTF-8")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(name="viewport", content="width=device-width, user-scalable=no")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
         link(rel="stylesheet", href="css/index.css")
         // build:js
@@ -20,10 +20,10 @@ html(lang="en")
 
             each _, i in new Array(3)
                 g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},0)` data-slot-type="dragon")
-                    rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
+                    rect(x=0 y=0 rx=5)
             
             g.card-slot(transform=`translate(${(cardWidth + cardGap * 2) * 3},0)` data-slot-type="flower")
-                rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
+                rect(x=0 y=0 rx=5)
 
             g#dragon-summoning-btns(transform=`translate(${(cardWidth + cardGap * 2) * 4},${circleRadius + cardGap})`)
                 each color, i in ['black', 'green', 'red']
@@ -38,18 +38,18 @@ html(lang="en")
 
             each _, i in new Array(3)
                 g.card-slot(transform=`translate(${(cardWidth + cardGap) * (i + 5)},0)` data-slot-type="collection")
-                    rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
+                    rect(x=0 y=0 rx=5)
 
             each _, i in new Array(8)
                 g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap * 4})` data-slot-type="stacking")
-                    rect(x=0 y=0 rx=5 width=cardWidth height=cardHeight)
+                    rect(x=0 y=0 rx=5)
 
         svg(width="0" height="0" style="position: absolute")
             defs
                 linearGradient#reflection(gradientTransform="rotate(90)")
                     stop(offset="5%" stop-color="grey")
                     stop(offset="95%" stop-color="whitesmoke")
-                filter#texture(x="-8%" y="-8%" width="110%" height="110%")
+                filter#texture(x="-8%" y="-8%" width="108%" height="108%")
                     feTurbulence(type="fractalNoise" baseFrequency="1" result="noise" numOctaves="1")
                     feSpecularLighting(in="noise" lighting-color="forestgreen" surfaceScale="4")
                         feDistantLight(azimuth="45" elevation="10")
