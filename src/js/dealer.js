@@ -2,13 +2,13 @@
 
 import {
     cardSlots,
+    dragonSlots,
     stackSlots,
-    table,
-    dragonSlots
+    table
 } from './dom-selections.js';
 import { group } from './dom-creations.js';
 import { indexOfNode } from './helper-functions.js';
-import { onTouchDevice } from './constants.js';
+import { eventTypeForMoving, eventTypeForStopMoving, onTouchDevice } from './constants.js';
 
 const shuffleCards = (deck) => {
     // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -49,6 +49,7 @@ const detectOverlap = (rect1, rect2) => !(rect1.right < rect2.left
     || rect1.left > rect2.right
     || rect1.bottom < rect2.top
     || rect1.top > rect2.bottom);
+const checkForWin = () => stackSlots.filter(s => s.children.length > 1).length === 0;
 
 export {
     dealCards,
@@ -77,27 +78,26 @@ function moveCard({ target, x: x1, y: y1 }) {
     movedSubStack.append(...cards);
     table.append(movedSubStack);
 
-    let cb;
+    let moveCardCb;
 
     if (onTouchDevice) {
-        cb = ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
+        moveCardCb = ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
             movedSubStack.setAttribute('transform', cardSlotPos + getTranslateString(
                 (x2 - x1),
                 (y2 - y1)
             ));
         };
-        window.addEventListener('touchmove', cb, { passive: true });
     } else {
-        cb = ({ x: x2, y: y2 }) => {
+        moveCardCb = ({ x: x2, y: y2 }) => {
             movedSubStack.setAttribute('transform', cardSlotPos + getTranslateString(
                 (x2 - x1),
                 (y2 - y1)
             ));
         };
-        window.addEventListener('pointermove', cb, { passive: true });
     }
 
-    window.addEventListener(onTouchDevice ? 'touchend' : 'pointerup', () => {
+    window.addEventListener(eventTypeForMoving, moveCardCb, { passive: true });
+    window.addEventListener(eventTypeForStopMoving, () => {
         const boundinRectsOfSlots = cardSlots
             .map(slot => [slot, slot.getBoundingClientRect()]);
         const boundingRectOfMoved = movedSubStack.getBoundingClientRect();
@@ -108,7 +108,11 @@ function moveCard({ target, x: x1, y: y1 }) {
 
         cards.forEach(c => targetSlot.append(c));
         movedSubStack.remove();
-        window.removeEventListener(onTouchDevice ? 'touchmove' : 'pointermove', cb);
+        window.removeEventListener(eventTypeForMoving, moveCardCb);
+
+        if (checkForWin()) {
+            console.log('You\'ve won');
+        }
     }, { once: true });
 }
 

@@ -2,6 +2,12 @@
 - const cardHeight = 178;
 - const cardGap = 8;
 - const circleRadius = 24;
+-
+    const viewBox = {
+        x: -cardGap - (cardWidth + cardGap),
+        y: -cardGap,
+        width: (cardWidth + cardGap) * 10 + cardGap, height: 732
+    };
 
 html(lang="en")
     head
@@ -15,8 +21,8 @@ html(lang="en")
         // endbuild
         title Shenzhen Solitaire
     body
-        svg#table(preserveAspectRatio="xMinYMin meet" viewBox=`${-cardGap} ${-cardGap} ${(cardWidth + cardGap) * 8 + cardGap} ${732}`)
-            rect(x=0 y=0 width=(cardWidth + cardGap) * 8 + cardGap height=732 filter="url(#texture)" fill="none")
+        svg#table(preserveAspectRatio="xMinYMax meet" viewBox=`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`)
+            rect(x=viewBox.x y=viewBox.y width=viewBox.width height=viewBox.height filter="url(#texture)" fill="none")
 
             each _, i in new Array(3)
                 g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},0)` data-slot-type="dragon")
@@ -41,7 +47,7 @@ html(lang="en")
                     rect(x=0 y=0 rx=5)
 
             each _, i in new Array(8)
-                g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap * 4})` data-slot-type="stacking")
+                g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap * 3})` data-slot-type="stacking")
                     rect(x=0 y=0 rx=5)
 
         svg(width="0" height="0" style="position: absolute")
@@ -49,7 +55,7 @@ html(lang="en")
                 linearGradient#reflection(gradientTransform="rotate(90)")
                     stop(offset="5%" stop-color="grey")
                     stop(offset="95%" stop-color="whitesmoke")
-                filter#texture(x="-8%" y="-8%" width="108%" height="108%")
+                filter#texture(x="0" y="0" width="100%" height="100%")
                     feTurbulence(type="fractalNoise" baseFrequency="1" result="noise" numOctaves="1")
                     feSpecularLighting(in="noise" lighting-color="forestgreen" surfaceScale="4")
                         feDistantLight(azimuth="45" elevation="10")
