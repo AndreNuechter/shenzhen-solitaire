@@ -9,7 +9,7 @@ You can play it in the [browser](https://andrenuechter.github.io/shenzhen-solita
 Overall there're 40 cards in the game, consisiting of three colored suits and a color-less card, called the "flower card".
 Each suit consists of 9 valued cards (1 to 9) and 4 value-less cards, called the "dragon cards".
 
-The goal of the game is to sort the cards dealt at the start: the flower card should be moved to its slot in the middle of the top row and the suits should be sorted from 1 to 9 in the three slots on right side of the top row; the three slots to the left of the top row are for temporarily storing an arbitrary card or all four dragon cards, once they're exposed.
+The goal of the game is to sort the cards dealt at the start: the flower card should be moved to its slot in the middle of the top row and the suits should be sorted from 1 to 9 in the three slots on the right side of the top row; the three slots to the left of the top row are for temporarily storing an arbitrary card or all four dragon cards, once they're exposed.
 Put another way, the game is won once all eight of the slots on the lower row are empty.
 
 To achieve this you may move the cards around on the lower stacks, where You can stack valued cards in descending order, while alternating colors. You can also temporarily store a single card on an unoccupied dragon slot (one of the three top-left).

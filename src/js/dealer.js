@@ -1,10 +1,12 @@
-/* globals window */
+/* globals window, document */
 
 import {
     cardSlots,
     dragonSlots,
     stackSlots,
-    table
+    table,
+    flowerSlot,
+    collectionSlots
 } from './dom-selections.js';
 import { group } from './dom-creations.js';
 import { indexOfNode } from './helper-functions.js';
@@ -52,10 +54,38 @@ const detectOverlap = (rect1, rect2) => !(rect1.right < rect2.left
 const checkForWin = () => stackSlots.filter(s => s.children.length > 1).length === 0;
 
 export {
+    collectCard,
     dealCards,
     moveCard,
     summonDragons
 };
+
+function collectCard({ x, y }) {
+    const target = document.elementFromPoint(x, y).parentElement;
+
+    if (!target.classList.contains('card')) return;
+
+    const slot = target.parentElement;
+
+    if (!['dragon', 'stacking'].includes(slot.dataset.slotType)) return;
+    if (slot.lastChild !== target) return;
+
+    const { color, value } = target.dataset;
+
+    if (value === '9') return;
+
+    let targetSlot;
+    if (value === '10') targetSlot = flowerSlot;
+    else {
+        const criteria = value === '0'
+            ? s => s.children.length === 1
+            : ({ lastChild: { dataset: { color: c, value: v } } }) => c === color && +v === (value - 1);
+
+        targetSlot = collectionSlots.find(criteria);
+    }
+
+    if (targetSlot) targetSlot.append(target);
+}
 
 function dealCards(deck) {
     shuffleCards(deck)
