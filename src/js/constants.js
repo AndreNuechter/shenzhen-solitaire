@@ -11,6 +11,8 @@ const onTouchDevice = 'ontouchstart' in window;
 const [eventTypeForMoving, eventTypeForStopMoving] = onTouchDevice
     ? ['touchmove', 'touchend']
     : ['pointermove', 'pointerup'];
+const cardWidth = 128;
+const width = (cardWidth + cardGap) * 10 + cardGap;
 
 export {
     cardDefaults,
@@ -18,5 +20,6 @@ export {
     eventTypeForMoving,
     eventTypeForStopMoving,
     ns,
-    onTouchDevice
+    onTouchDevice,
+    width
 };

@@ -10,7 +10,12 @@ import {
 } from './dom-selections.js';
 import { group } from './dom-creations.js';
 import { indexOfNode } from './helper-functions.js';
-import { eventTypeForMoving, eventTypeForStopMoving, onTouchDevice } from './constants.js';
+import {
+    eventTypeForMoving,
+    eventTypeForStopMoving,
+    onTouchDevice,
+    width
+} from './constants.js';
 
 const shuffleCards = (deck) => {
     // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -52,11 +57,13 @@ const detectOverlap = (rect1, rect2) => !(rect1.right < rect2.left
     || rect1.bottom < rect2.top
     || rect1.top > rect2.bottom);
 const checkForWin = () => stackSlots.filter(s => s.children.length > 1).length === 0;
+let scalingFactor;
 
 export {
     collectCard,
     dealCards,
     moveCard,
+    setScalingFactor,
     summonDragons
 };
 
@@ -77,11 +84,11 @@ function collectCard({ x, y }) {
     let targetSlot;
     if (value === '10') targetSlot = flowerSlot;
     else {
-        const criteria = value === '0'
+        const predicate = value === '0'
             ? s => s.children.length === 1
             : ({ lastChild: { dataset: { color: c, value: v } } }) => c === color && +v === (value - 1);
 
-        targetSlot = collectionSlots.find(criteria);
+        targetSlot = collectionSlots.find(predicate);
     }
 
     if (targetSlot) targetSlot.append(target);
@@ -112,17 +119,19 @@ function moveCard({ target, x: x1, y: y1 }) {
 
     if (onTouchDevice) {
         moveCardCb = ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
-            movedSubStack.setAttribute('transform', cardSlotPos + getTranslateString(
-                (x2 - x1),
-                (y2 - y1)
-            ));
+            movedSubStack
+                .setAttribute('transform', cardSlotPos + getTranslateString(
+                    (x2 - x1),
+                    (y2 - y1)
+                ));
         };
     } else {
         moveCardCb = ({ x: x2, y: y2 }) => {
-            movedSubStack.setAttribute('transform', cardSlotPos + getTranslateString(
-                (x2 - x1),
-                (y2 - y1)
-            ));
+            movedSubStack
+                .setAttribute('transform', cardSlotPos + getTranslateString(
+                    (x2 - x1) * scalingFactor,
+                    (y2 - y1) * scalingFactor
+                ));
         };
     }
 
@@ -144,6 +153,10 @@ function moveCard({ target, x: x1, y: y1 }) {
             console.log('You\'ve won');
         }
     }, { once: true });
+}
+
+function setScalingFactor() {
+    scalingFactor = +((width / table.clientWidth)).toFixed(2);
 }
 
 function summonDragons({ target }) {

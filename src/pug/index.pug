@@ -6,15 +6,20 @@
     const viewBox = {
         x: -cardGap - (cardWidth + cardGap),
         y: -cardGap,
-        width: (cardWidth + cardGap) * 10 + cardGap, height: 732
+        width: (cardWidth + cardGap) * 10 + cardGap,
+        get height() { return Math.ceil((this.width / 16) * 9); }
     };
 
+doctype html
 html(lang="en")
     head
         meta(charset="UTF-8")
-        meta(name="viewport", content="width=device-width, user-scalable=no")
-        meta(http-equiv="X-UA-Compatible", content="ie=edge")
-        link(rel="stylesheet", href="css/index.css")
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        meta(http-equiv="X-UA-Compatible" content="ie=edge")
+        meta(name="description" content="A version of the popular card-game.")
+        meta(name="theme-color" content="gold")
+        link(rel="manifest" href="/manifest.json")
+        link(rel="stylesheet" href="css/index.css")
         // build:js
         script(src="js/index.js" type="module")
         script(src="js/card-slots.js" type="module")

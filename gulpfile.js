@@ -62,6 +62,13 @@ function js() {
         .pipe(dest(`${deployDir}/`));
 }
 
+function pwaAssets() {
+    src('src/images/*.png')
+        .pipe(dest(`${deployDir}/images`));
+    return src('src/manifest.json')
+        .pipe(dest(`${deployDir}/`));
+}
+
 function watchCSSAndHTML() {
     watch(style, css);
     watch('src/pug/*.pug', html);
@@ -71,8 +78,9 @@ function serve() {
     const app = express();
     app.use(express.static('src'));
     app.use(express.static(devDir));
+    // eslint-disable-next-line no-console
     app.listen(3000, () => console.log(proverbs[randomInt(proverbs.length, 0)]));
 }
 
 exports.default = parallel(html, css, serve, watchCSSAndHTML);
-exports.bundle = parallel(htmlProd, cssProd, js);
+exports.bundle = parallel(htmlProd, cssProd, js, pwaAssets);
