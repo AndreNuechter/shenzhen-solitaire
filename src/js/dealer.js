@@ -68,16 +68,16 @@ export {
 };
 
 function collectCard({ x, y }) {
-    const target = document.elementFromPoint(x, y).parentElement;
+    const card = document.elementFromPoint(x, y).parentElement;
 
-    if (!target.classList.contains('card')) return;
+    if (!card.classList.contains('card')) return;
 
-    const slot = target.parentElement;
+    const srcSlot = card.parentElement;
 
-    if (!['dragon', 'stacking'].includes(slot.dataset.slotType)) return;
-    if (slot.lastChild !== target) return;
+    if (!['dragon', 'stacking'].includes(srcSlot.dataset.slotType)) return;
+    if (srcSlot.lastChild !== card) return;
 
-    const { color, value } = target.dataset;
+    const { color, value } = card.dataset;
 
     if (value === '9') return;
 
@@ -91,7 +91,23 @@ function collectCard({ x, y }) {
         targetSlot = collectionSlots.find(predicate);
     }
 
-    if (targetSlot) targetSlot.append(target);
+    if (targetSlot) translateCard(srcSlot, targetSlot, card);
+}
+
+const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
+const animationDuration = 500;
+
+function translateCard(srcSlot, targetSlot, card) { // TODO module only so move up
+    const initialTransform = srcSlot.getAttribute('transform').replace(...replacerArgs);
+    const finalTransform = targetSlot.getAttribute('transform').replace(...replacerArgs);
+    table.append(card);
+
+    card.animate({
+        transform: [initialTransform, finalTransform],
+        easing: ['ease-in', 'ease-out']
+    }, animationDuration);
+
+    setTimeout(() => targetSlot.append(card), animationDuration);
 }
 
 function dealCards(deck) {
