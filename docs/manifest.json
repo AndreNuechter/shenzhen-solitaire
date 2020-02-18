@@ -1,8 +1,7 @@
 {
     "name": "Shenzhen Solitaire",
     "short_name": "shenzhenSolitaire",
-    "icons": [
-    {
+    "icons": [{
         "src": "/images/icons-192.png",
         "type": "image/png",
         "sizes": "192x192"
@@ -11,7 +10,7 @@
         "type": "image/png",
         "sizes": "512x512"
     }],
-    "start_url": "/",
+    "start_url": "/shenzhen-solitaire/",
     "background_color": "forestgreen",
     "display": "standalone",
     "orientation": "landscape",

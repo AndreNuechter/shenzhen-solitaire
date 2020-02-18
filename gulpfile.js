@@ -10,6 +10,7 @@ const minifyCSS = require('gulp-csso');
 const express = require('express');
 const htmlreplace = require('gulp-html-replace');
 const webpack = require('webpack-stream');
+const jeditor = require('gulp-json-editor');
 const webpackConfig = require('./webpack.config.js');
 
 const randomInt = (max, min) => Math.trunc(Math.random() * max) - min;
@@ -66,6 +67,10 @@ function pwaAssets() {
     src('src/images/*.png')
         .pipe(dest(`${deployDir}/images`));
     return src('src/manifest.json')
+        .pipe(jeditor((json) => {
+            json.start_url = '/shenzhen-solitaire/';
+            return json;
+        }))
         .pipe(dest(`${deployDir}/`));
 }
 
