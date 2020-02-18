@@ -57,6 +57,19 @@ const detectOverlap = (rect1, rect2) => !(rect1.right < rect2.left
     || rect1.bottom < rect2.top
     || rect1.top > rect2.bottom);
 const checkForWin = () => stackSlots.filter(s => s.children.length > 1).length === 0;
+const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
+const animationDuration = 500;
+const translateCard = (srcSlot, targetSlot, card) => {
+    const cardTransforms = card.getAttribute('transform').replace(...replacerArgs);
+    const initialTransform = srcSlot.getAttribute('transform').replace(...replacerArgs);
+    const finalTransform = targetSlot.getAttribute('transform').replace(...replacerArgs);
+
+    table.append(card);
+    card.animate({
+        transform: [cardTransforms + initialTransform, finalTransform],
+        easing: ['ease-in', 'ease-out']
+    }, animationDuration).onfinish = () => targetSlot.append(card);
+};
 let scalingFactor;
 
 export {
@@ -92,22 +105,6 @@ function collectCard({ x, y }) {
     }
 
     if (targetSlot) translateCard(srcSlot, targetSlot, card);
-}
-
-const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
-const animationDuration = 500;
-
-function translateCard(srcSlot, targetSlot, card) { // TODO module only so move up
-    const initialTransform = srcSlot.getAttribute('transform').replace(...replacerArgs);
-    const finalTransform = targetSlot.getAttribute('transform').replace(...replacerArgs);
-    table.append(card);
-
-    card.animate({
-        transform: [initialTransform, finalTransform],
-        easing: ['ease-in', 'ease-out']
-    }, animationDuration);
-
-    setTimeout(() => targetSlot.append(card), animationDuration);
 }
 
 function dealCards(deck) {
@@ -194,7 +191,8 @@ function summonDragons({ target }) {
         || (cards[1].dataset.value === '9' && cards[1].dataset.color === btnColor));
 
     if (dragons.length === 4 && freeDragonSlots.length) {
-        freeDragonSlots[0].append(...dragons);
+        dragons
+            .forEach((d, i) => setTimeout(() => translateCard(d.parentElement, freeDragonSlots[0], d), 25 * i));
         freeDragonSlots[0].style.pointerEvents = 'none';
     }
 }
