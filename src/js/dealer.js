@@ -26,16 +26,20 @@ const shuffleCards = (deck) => {
     return deck;
 };
 const getTranslateString = (x, y) => `translate(${x},${y})`;
+// for all but the last item, is its value one less than the next and a different color?
 const isOutOfOrder = ({ dataset: { color, value } }, i, arr) => i < (arr.length - 1)
     && (+arr[i + 1].dataset.value !== value - 1 || arr[i + 1].dataset.color === color);
 const stackRules = {
     dragon: (movedSubStack, slot) => movedSubStack.children.length === 1
         && slot.children.length === 1,
-    flower: ({ children: [card] }) => card.dataset.value === '10',
+    flower: ({ children: [{ dataset: { color, value } }] }) => !value && !color,
     collection: ({ children: movedCards }, { children: collected }) => {
         const dataOfFirstMoved = movedCards[0].dataset;
         const dataOfLastCollected = collected[collected.length - 1].dataset;
 
+        // only single cards may be added to a collection
+        // an empty collection slot, does only take a 0-valued card
+        // an not empty slot, only takes cards of the same color, one higher than the top card
         return movedCards.length === 1
             && ((collected.length === 1 && dataOfFirstMoved.value === '0')
                 || (+dataOfFirstMoved.value === (+dataOfLastCollected.value + 1)
@@ -44,8 +48,10 @@ const stackRules = {
     stacking: ({ children: [{ dataset: dataOfBottomMoved }] }, { children: stacked }) => {
         const dataOfTopStacked = stacked[stacked.length - 1].dataset;
 
+        // if stacked has length 1, it's empty, so any movable stack can go here
+        // else we enforce descending values and alternating colors
         return stacked.length === 1
-            || (+dataOfTopStacked.value !== 9
+            || (dataOfTopStacked.value
                 && +dataOfBottomMoved.value === +dataOfTopStacked.value - 1
                 && dataOfBottomMoved.color !== dataOfTopStacked.color);
     }
@@ -92,10 +98,10 @@ function collectCard({ x, y }) {
 
     const { color, value } = card.dataset;
 
-    if (value === '9') return;
+    if (!value && color) return;
 
     let targetSlot;
-    if (value === '10') targetSlot = flowerSlot;
+    if (!value) targetSlot = flowerSlot;
     else {
         const predicate = value === '0'
             ? s => s.children.length === 1
@@ -181,14 +187,14 @@ function summonDragons({ target }) {
     const dragons = [...stackSlots, ...dragonSlots].reduce((arr, { children: cards }) => {
         const { color: cardColor, value } = cards[cards.length - 1].dataset;
 
-        if (cardColor === btnColor && value === '9') {
+        if (cardColor === btnColor && !value) {
             arr.push(cards[cards.length - 1]);
         }
 
         return arr;
     }, []);
     const freeDragonSlots = dragonSlots.filter(({ children: cards }) => cards.length === 1
-        || (cards[1].dataset.value === '9' && cards[1].dataset.color === btnColor));
+        || (!cards[1].dataset.value && cards[1].dataset.color === btnColor));
 
     if (dragons.length === 4 && freeDragonSlots.length) {
         dragons

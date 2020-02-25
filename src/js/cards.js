@@ -19,19 +19,19 @@ const cardTemplate = (color, value) => {
         y: 16
     });
     cardFace.textContent = (() => {
-        if (value < 9) return `${symbols[color]} ${value + 1}`;
-        if (value === 9) return symbols.dragon;
+        if (color && value === '') return symbols.dragon;
+        if (color) return `${symbols[color]} ${value + 1}`;
         return symbols.flower;
     })();
     card.append(cardBoard, cardFace);
     Object.assign(card.dataset, { color, value });
     return card;
 };
-// NOTE: values 0-8 are for normal cards; 9 is for dragons; and 10 is for the flower
+// NOTE: values 0-8 are for normal cards, dragons have no value and the flower has neither color nor value
 const cards = colors
     .flatMap(color => Array
         .from({ length: 13 },
-            (_, i) => cardTemplate(color, i <= 8 ? i : 9)));
-cards.push(cardTemplate('', 10));
+            (_, i) => cardTemplate(color, i <= 8 ? i : '')));
+cards.push(cardTemplate('', ''));
 
 export default cards;
