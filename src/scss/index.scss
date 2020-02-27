@@ -43,8 +43,17 @@ g[data-color=""] {
     }
 }
 
+#reset-btn {
+    position: absolute;
+    right: 0;
+    background: black;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
 #table {
-    height: auto;
+    height: 100%;
     width: auto;
     display: block;
     margin: 0 auto;

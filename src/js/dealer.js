@@ -29,7 +29,7 @@ const getTranslateString = (x, y) => `translate(${x},${y})`;
 // for all but the last item, is its value one less than the next and a different color?
 const isOutOfOrder = ({ dataset: { color, value } }, i, arr) => i < (arr.length - 1)
     && (+arr[i + 1].dataset.value !== value - 1 || arr[i + 1].dataset.color === color);
-const stackRules = {
+const stackRules = { // rules for stacking cards on a slot (keys are slot-types)
     dragon: (movedSubStack, slot) => movedSubStack.children.length === 1
         && slot.children.length === 1,
     flower: ({ children: [{ dataset: { color, value } }] }) => !value && !color,
@@ -62,13 +62,14 @@ const detectOverlap = (rect1, rect2) => !(rect1.right < rect2.left
     || rect1.left > rect2.right
     || rect1.bottom < rect2.top
     || rect1.top > rect2.bottom);
-const checkForWin = () => stackSlots.filter(s => s.children.length > 1).length === 0;
+const checkForWin = () => stackSlots.every(s => s.children.length === 1);
 const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
+const getTransforms = e => e.getAttribute('transform').replace(...replacerArgs);
 const animationDuration = 500;
 const translateCard = (srcSlot, targetSlot, card) => {
-    const cardTransforms = card.getAttribute('transform').replace(...replacerArgs);
-    const initialTransform = srcSlot.getAttribute('transform').replace(...replacerArgs);
-    const finalTransform = targetSlot.getAttribute('transform').replace(...replacerArgs);
+    const cardTransforms = getTransforms(card);
+    const initialTransform = getTransforms(srcSlot);
+    const finalTransform = getTransforms(targetSlot);
 
     table.append(card);
     card.animate({
@@ -154,6 +155,8 @@ function moveCard({ target, x: x1, y: y1 }) {
         };
     }
 
+    const start = Date.now();
+
     window.addEventListener(eventTypeForMoving, moveCardCb, { passive: true });
     window.addEventListener(eventTypeForStopMoving, () => {
         const boundinRectsOfSlots = cardSlots
@@ -163,8 +166,12 @@ function moveCard({ target, x: x1, y: y1 }) {
             .find(([slot, rect]) => detectOverlap(boundingRectOfMoved, rect)
                 && canBeMovedHere(movedSubStack, slot));
         const targetSlot = overlapping ? overlapping[0] : cardSlot;
+        const end = Date.now();
 
-        cards.forEach(c => targetSlot.append(c));
+        // checking time to not break dblclick
+        cards.forEach(c => (targetSlot === cardSlot && (end - start) > 500
+            ? translateCard(movedSubStack, cardSlot, c)
+            : targetSlot.append(c)));
         movedSubStack.remove();
         window.removeEventListener(eventTypeForMoving, moveCardCb);
 
@@ -184,7 +191,7 @@ function summonDragons({ target }) {
     if (!btn) return;
 
     const { color: btnColor } = btn.dataset;
-    const dragons = [...stackSlots, ...dragonSlots].reduce((arr, { children: cards }) => {
+    const reducer = (arr, { children: cards }) => {
         const { color: cardColor, value } = cards[cards.length - 1].dataset;
 
         if (cardColor === btnColor && !value) {
@@ -192,13 +199,15 @@ function summonDragons({ target }) {
         }
 
         return arr;
-    }, []);
-    const freeDragonSlots = dragonSlots.filter(({ children: cards }) => cards.length === 1
-        || (!cards[1].dataset.value && cards[1].dataset.color === btnColor));
+    };
+    const sieve = ({ children: cards }) => cards.length === 1
+        || (!cards[1].dataset.value && cards[1].dataset.color === btnColor);
+    const dragons = [...stackSlots, ...dragonSlots].reduce(reducer, []);
+    const freeDragonSlots = dragonSlots.filter(sieve);
 
     if (dragons.length === 4 && freeDragonSlots.length) {
-        dragons
-            .forEach((d, i) => setTimeout(() => translateCard(d.parentElement, freeDragonSlots[0], d), 25 * i));
+        const cb = d => translateCard(d.parentElement, freeDragonSlots[0], d);
+        dragons.forEach((d, i) => setTimeout(cb(d), 25 * i));
         freeDragonSlots[0].style.pointerEvents = 'none';
     }
 }
