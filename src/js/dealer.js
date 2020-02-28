@@ -14,7 +14,8 @@ import {
     eventTypeForMoving,
     eventTypeForStopMoving,
     onTouchDevice,
-    width
+    width,
+    cardGap
 } from './constants.js';
 
 const shuffleCards = (deck) => {
@@ -37,9 +38,9 @@ const stackRules = { // rules for stacking cards on a slot (keys are slot-types)
         const dataOfFirstMoved = movedCards[0].dataset;
         const dataOfLastCollected = collected[collected.length - 1].dataset;
 
-        // only single cards may be added to a collection
+        // only single cards may be added to a collection slot
         // an empty collection slot, does only take a 0-valued card
-        // an not empty slot, only takes cards of the same color, one higher than the top card
+        // an non-empty slot, only takes cards of the same color, valued one higher than the top card
         return movedCards.length === 1
             && ((collected.length === 1 && dataOfFirstMoved.value === '0')
                 || (+dataOfFirstMoved.value === (+dataOfLastCollected.value + 1)
@@ -69,7 +70,11 @@ const animationDuration = 500;
 const translateCard = (srcSlot, targetSlot, card) => {
     const cardTransforms = getTransforms(card);
     const initialTransform = getTransforms(srcSlot);
-    const finalTransform = getTransforms(targetSlot);
+    const finalTransform = `${
+        getTransforms(targetSlot)
+    }translateY(${
+        (targetSlot.children.length - 1) * cardGap * 2
+    }px)`;
 
     table.append(card);
     card.animate({
@@ -168,8 +173,8 @@ function moveCard({ target, x: x1, y: y1 }) {
         const targetSlot = overlapping ? overlapping[0] : cardSlot;
         const end = Date.now();
 
-        // checking time to not break dblclick
-        cards.forEach(c => (targetSlot === cardSlot && (end - start) > 500
+        // NOTE: checking time to not break dblclick
+        cards.forEach(c => (targetSlot === cardSlot && (end - start) > animationDuration
             ? translateCard(movedSubStack, cardSlot, c)
             : targetSlot.append(c)));
         movedSubStack.remove();
@@ -207,7 +212,9 @@ function summonDragons({ target }) {
 
     if (dragons.length === 4 && freeDragonSlots.length) {
         const cb = d => translateCard(d.parentElement, freeDragonSlots[0], d);
-        dragons.forEach((d, i) => setTimeout(cb(d), 25 * i));
-        freeDragonSlots[0].style.pointerEvents = 'none';
+        dragons.forEach((d, i) => {
+            d.classList.add('card--frozen');
+            setTimeout(cb(d), 25 * i);
+        });
     }
 }
