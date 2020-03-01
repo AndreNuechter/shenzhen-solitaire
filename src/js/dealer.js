@@ -129,7 +129,7 @@ function moveCard({ target, x: x1, y: y1 }) {
 
     const card = target.parentNode;
     const cardSlot = card.parentNode;
-    const cardSlotPos = cardSlot.getAttribute('transform');
+    const cardSlotPos = cardSlot.getAttribute('transform'); // BUG: may be null
     const cards = [...cardSlot.children]
         .slice(indexOfNode(cardSlot.children, card));
 
@@ -205,15 +205,15 @@ function summonDragons({ target }) {
 
         return arr;
     };
-    const sieve = ({ children: cards }) => cards.length === 1
+    const predicate = ({ children: cards }) => cards.length === 1
         || (!cards[1].dataset.value && cards[1].dataset.color === btnColor);
     const dragons = [...stackSlots, ...dragonSlots].reduce(reducer, []);
-    const freeDragonSlots = dragonSlots.filter(sieve);
+    const targetSlot = dragonSlots.find(predicate);
 
-    if (dragons.length === 4 && freeDragonSlots.length) {
-        const cb = d => translateCard(d.parentElement, freeDragonSlots[0], d);
+    if (dragons.length === 4 && targetSlot) {
+        const cb = d => translateCard(d.parentElement, targetSlot, d);
         dragons.forEach((d, i) => {
-            d.classList.add('card--frozen');
+            d.classList.add('frozen');
             setTimeout(cb(d), 25 * i);
         });
     }

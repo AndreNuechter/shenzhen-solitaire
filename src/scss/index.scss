@@ -81,8 +81,18 @@ g[data-color=""] {
         stroke: none;
     }
 
-    &--frozen {
+    &.frozen {
         pointer-events: none;
+    }
+}
+
+@keyframes flip-over {
+    from {
+        transform: scale(1, 1)translateX(0);
+    }
+
+    to {
+        transform: scale(-1, 1)translateX(-9.35%);
     }
 }
 
@@ -96,6 +106,14 @@ g[data-color=""] {
     rect {
         width: 128px;
         height: 178px;
+    }
+
+    &.consumed {
+        .card.frozen {
+            fill: url('#reflection');
+            // stroke: url('#star');
+            animation: flip-over .4s ease 1 forwards;
+        }
     }
 }
 
