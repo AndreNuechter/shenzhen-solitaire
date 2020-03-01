@@ -1,6 +1,11 @@
 /* globals window */
 
-import { dragonSummoningBtns, resetBtn, table } from './dom-selections.js';
+import {
+    cardSlots,
+    dragonSummoningBtns,
+    resetBtn,
+    table
+} from './dom-selections.js';
 import cards from './cards.js';
 import {
     collectCard,
@@ -11,10 +16,11 @@ import {
 } from './dealer.js';
 
 dragonSummoningBtns.onclick = summonDragons;
-table.ondblclick = collectCard;
+window.ondblclick = collectCard;
 table.addEventListener('pointerdown', moveCard, { passive: true });
 resetBtn.onclick = () => {
-    cards.forEach(c => c.classList.remove('card--frozen'));
+    cardSlots.forEach(c => c.classList.remove('consumed'));
+    cards.forEach(c => c.classList.remove('frozen'));
     dealCards(cards);
 };
 window.addEventListener('DOMContentLoaded', () => {
