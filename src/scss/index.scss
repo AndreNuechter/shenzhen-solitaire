@@ -86,15 +86,6 @@ g[data-color=""] {
     }
 }
 
-@keyframes flip-over {
-    from {
-        transform: scale(1, 1)translateX(0);
-    }
-
-    to {
-        transform: scale(-1, 1)translateX(-9.35%);
-    }
-}
 
 .card-slot {
     fill: none;
@@ -110,10 +101,38 @@ g[data-color=""] {
 
     &.consumed {
         .card.frozen {
-            fill: url('#reflection');
-            // stroke: url('#star');
-            animation: flip-over .4s ease 1 forwards;
+            animation: flip-over .5s ease 1 forwards;
+
+            text {
+                animation: fade .5s ease 1 forwards;
+            }
         }
+    }
+}
+
+@keyframes flip-over {
+    0% {
+        transform: scale(1, 1)translateX(0);
+    }
+
+    95% {
+        fill: url('#card-backside');
+    }
+
+    100% {
+        transform: scale(-1, 1)translateX(-9.35%);
+        fill: url('#card-backside');
+    }
+}
+
+@keyframes fade {
+    0% {
+        opacity: 1;
+    }
+
+    95%,
+    100% {
+        opacity: 0;
     }
 }
 

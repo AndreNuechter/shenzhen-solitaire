@@ -1,5 +1,6 @@
 /* globals window */
 
+const animationDuration = 500;
 const cardGap = 8;
 const cardDefaults = {
     x: 0,
@@ -15,6 +16,7 @@ const cardWidth = 128;
 const width = (cardWidth + cardGap) * 10 + cardGap;
 
 export {
+    animationDuration,
     cardDefaults,
     cardGap,
     eventTypeForMoving,
