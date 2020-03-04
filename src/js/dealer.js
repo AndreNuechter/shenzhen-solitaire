@@ -74,7 +74,11 @@ function moveCard({ target, x: x1, y: y1 }) {
 
     const card = target.parentNode;
     const cardSlot = card.parentNode;
-    const cardSlotPos = cardSlot.getAttribute('transform'); // BUG: may be null
+    const cardSlotPos = cardSlot.getAttribute('transform');
+
+    // I presume this may be null when clicking on a card being animated
+    if (!cardSlotPos) return;
+
     const cards = [...cardSlot.children]
         .slice(indexOfNode(cardSlot.children, card));
 

@@ -54,10 +54,10 @@ function detectOverlap(rect1, rect2) {
 
 function getTranslateString(x, y) { return `translate(${x},${y})`; }
 
-// for all but the last item, is its value one less than the next and a different color?
-function isOutOfOrder({ dataset: { color, value } }, i, arr) {
-    return i < (arr.length - 1)
-        && (+arr[i + 1].dataset.value !== value - 1 || arr[i + 1].dataset.color === color);
+// for all but the last card, is its value one less than the next and a different color?
+function isOutOfOrder({ dataset: { color, value } }, position, cardStack) {
+    return position < (cardStack.length - 1)
+        && (+cardStack[position + 1].dataset.value !== value - 1 || cardStack[position + 1].dataset.color === color);
 }
 
 function shuffleCards(deck) {

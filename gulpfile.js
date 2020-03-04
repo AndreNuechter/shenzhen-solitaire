@@ -69,6 +69,8 @@ function pwaAssets() {
     return src('src/manifest.json')
         .pipe(jeditor((json) => {
             json.start_url = '/shenzhen-solitaire/';
+            json.icons[0].src = '/shenzhen-solitaire/images/icons-192.png';
+            json.icons[1].src = '/shenzhen-solitaire/images/icons-512.png';
             return json;
         }))
         .pipe(dest(`${deployDir}/`));
