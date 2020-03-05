@@ -43,12 +43,14 @@ g[data-color=""] {
     }
 }
 
+$upper-border-width: 8px;
+
 #reset-btn {
     position: absolute;
     right: 0;
     background: black;
-    width: 24px;
-    height: 24px;
+    width: $upper-border-width * 3;
+    height: $upper-border-width;
     cursor: pointer;
 }
 
@@ -59,8 +61,8 @@ g[data-color=""] {
     margin: 0 auto;
     background: forestgreen;
     border: 3px solid var(--border-color);
-    border-top: 24px solid var(--border-color);
-    border-bottom: 24px solid var(--border-color);
+    border-top: $upper-border-width solid var(--border-color);
+    border-bottom: $upper-border-width solid var(--border-color);
     user-select: none;
 }
 
@@ -120,7 +122,7 @@ g[data-color=""] {
     }
 
     100% {
-        transform: scale(-1, 1)translateX(-9.35%);
+        transform: scale(-1, 1)translateX(-11.65%);
         fill: url('#card-backside');
     }
 }

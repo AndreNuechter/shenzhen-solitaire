@@ -95,8 +95,8 @@ function moveCard({ target, x: x1, y: y1 }) {
         moveCardCb = ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
             movedSubStack
                 .setAttribute('transform', cardSlotPos + getTranslateString(
-                    (x2 - x1),
-                    (y2 - y1)
+                    (x2 - x1) * scalingFactor,
+                    (y2 - y1) * scalingFactor
                 ));
         };
     } else {

@@ -13,7 +13,7 @@ const [eventTypeForMoving, eventTypeForStopMoving] = onTouchDevice
     ? ['touchmove', 'touchend']
     : ['pointermove', 'pointerup'];
 const cardWidth = 128;
-const width = (cardWidth + cardGap) * 10 + cardGap;
+const width = (cardWidth + cardGap) * 8 + cardGap;
 
 export {
     animationDuration,
