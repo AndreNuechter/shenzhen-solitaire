@@ -1,10 +1,10 @@
 /* globals window, document */
 
 import {
+    areOverlapping,
     canBeMovedHere,
-    checkForWin,
-    detectOverlap,
     getTranslateString,
+    hasWon,
     isOutOfOrder,
     shuffleCards,
     translateCard
@@ -44,22 +44,29 @@ function collectCard({ x, y }) {
 
     const srcSlot = card.parentElement;
 
-    if (!['dragon', 'stacking'].includes(srcSlot.dataset.slotType)) return;
+    if (['flower', 'collection'].includes(srcSlot.dataset.slotType)) return;
     if (srcSlot.lastChild !== card) return;
 
     const { color, value } = card.dataset;
 
     if (!value && color) return;
 
-    let targetSlot;
-    if (!value) targetSlot = flowerSlot;
-    else {
+    const targetSlot = (() => {
+        if (!value) return flowerSlot;
+
         const predicate = value === '0'
             ? s => s.children.length === 1
-            : ({ lastChild: { dataset: { color: c, value: v } } }) => c === color && +v === (value - 1);
+            : ({
+                lastChild: {
+                    dataset: {
+                        color: c,
+                        value: v
+                    }
+                }
+            }) => c === color && +v === (value - 1);
 
-        targetSlot = collectionSlots.find(predicate);
-    }
+        return collectionSlots.find(predicate);
+    })();
 
     if (targetSlot) translateCard(srcSlot, targetSlot, card, table);
 }
@@ -69,10 +76,9 @@ function dealCards(deck) {
         .forEach((card, i) => stackSlots[i % 8].append(card));
 }
 
-function moveCard({ target, x: x1, y: y1 }) {
-    if (!target.parentNode.classList.contains('card')) return;
+function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
+    if (!card.classList.contains('card')) return;
 
-    const card = target.parentNode;
     const cardSlot = card.parentNode;
     const cardSlotPos = cardSlot.getAttribute('transform');
 
@@ -85,51 +91,50 @@ function moveCard({ target, x: x1, y: y1 }) {
     if (cards.some(isOutOfOrder)) return;
 
     const movedSubStack = group.cloneNode(false);
+    const moveCardCb = (() => {
+        if (onTouchDevice) {
+            return ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
+                movedSubStack
+                    .setAttribute('transform', cardSlotPos + getTranslateString(
+                        (x2 - x1) * scalingFactor,
+                        (y2 - y1) * scalingFactor
+                    ));
+            };
+        }
+        return ({ x: x2, y: y2 }) => {
+            movedSubStack
+                .setAttribute('transform', cardSlotPos + getTranslateString(
+                    (x2 - x1) * scalingFactor,
+                    (y2 - y1) * scalingFactor
+                ));
+        };
+    })();
+    const start = Date.now();
+
     movedSubStack.setAttribute('transform', cardSlotPos);
     movedSubStack.append(...cards);
     table.append(movedSubStack);
 
-    let moveCardCb;
-
-    if (onTouchDevice) {
-        moveCardCb = ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
-            movedSubStack
-                .setAttribute('transform', cardSlotPos + getTranslateString(
-                    (x2 - x1) * scalingFactor,
-                    (y2 - y1) * scalingFactor
-                ));
-        };
-    } else {
-        moveCardCb = ({ x: x2, y: y2 }) => {
-            movedSubStack
-                .setAttribute('transform', cardSlotPos + getTranslateString(
-                    (x2 - x1) * scalingFactor,
-                    (y2 - y1) * scalingFactor
-                ));
-        };
-    }
-
-    const start = Date.now();
-
     window.addEventListener(eventTypeForMoving, moveCardCb, { passive: true });
     window.addEventListener(eventTypeForStopMoving, () => {
-        const boundinRectsOfSlots = cardSlots
-            .map(slot => [slot, slot.getBoundingClientRect()]);
+        const getRects = slot => [slot, slot.getBoundingClientRect()];
+        const boundinRectsOfSlots = cardSlots.map(getRects);
         const boundingRectOfMoved = movedSubStack.getBoundingClientRect();
-        const overlapping = boundinRectsOfSlots
-            .find(([slot, rect]) => detectOverlap(boundingRectOfMoved, rect)
-                && canBeMovedHere(movedSubStack, slot));
+        const predicate = ([slot, rect]) => areOverlapping(boundingRectOfMoved, rect)
+            && canBeMovedHere(movedSubStack, slot);
+        const overlapping = boundinRectsOfSlots.find(predicate);
         const targetSlot = overlapping ? overlapping[0] : cardSlot;
-        const end = Date.now();
-
         // NOTE: checking time to not break dblclick
-        cards.forEach(c => (targetSlot === cardSlot && (end - start) > animationDuration
+        const end = Date.now() - start;
+        const cb = c => (targetSlot === cardSlot && end > animationDuration
             ? translateCard(movedSubStack, cardSlot, c, table)
-            : targetSlot.append(c)));
+            : targetSlot.append(c));
+
+        cards.forEach(cb);
         movedSubStack.remove();
         window.removeEventListener(eventTypeForMoving, moveCardCb);
 
-        if (checkForWin(stackSlots)) {
+        if (hasWon(stackSlots)) {
             console.log('You\'ve won');
         }
     }, { once: true });
@@ -157,10 +162,10 @@ function summonDragons({ target }) {
     const predicate = ({ children: cards }) => cards.length === 1
         || (!cards[1].dataset.value && cards[1].dataset.color === btnColor);
     const dragons = [...stackSlots, ...dragonSlots].reduce(reducer, []);
-    const targetSlot = dragonSlots.find(predicate);
+    const freeDragonSlot = dragonSlots.find(predicate);
 
-    if (dragons.length === 4 && targetSlot) {
-        const cb = d => translateCard(d.parentElement, targetSlot, d, table);
+    if (dragons.length === 4 && freeDragonSlot) {
+        const cb = d => translateCard(d.parentElement, freeDragonSlot, d, table);
         dragons.forEach((d, i) => {
             d.classList.add('frozen');
             setTimeout(cb(d), 25 * i);

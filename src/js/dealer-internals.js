@@ -31,28 +31,32 @@ const stackRules = { // rules for stacking cards on a slot (keys are slot-types)
 };
 
 export {
+    areOverlapping,
     canBeMovedHere,
-    checkForWin,
-    detectOverlap,
     getTranslateString,
+    hasWon,
     isOutOfOrder,
     shuffleCards,
     translateCard
 };
 
-function canBeMovedHere(movedSubStack, slot) { return stackRules[slot.dataset.slotType](movedSubStack, slot); }
-
-function checkForWin(stackSlots) { return stackSlots.every(s => s.children.length === 1); }
-
 // https://stackoverflow.com/questions/12066870/how-to-check-if-an-element-is-overlapping-other-elements
-function detectOverlap(rect1, rect2) {
+function areOverlapping(rect1, rect2) {
     return !(rect1.right < rect2.left
         || rect1.left > rect2.right
         || rect1.bottom < rect2.top
         || rect1.top > rect2.bottom);
 }
 
+function canBeMovedHere(movedSubStack, slot) {
+    return stackRules[slot.dataset.slotType](movedSubStack, slot);
+}
+
 function getTranslateString(x, y) { return `translate(${x},${y})`; }
+
+function hasWon(stackSlots) {
+    return stackSlots.every(s => s.children.length === 1);
+}
 
 // for all but the last card, is its value one less than the next and a different color?
 function isOutOfOrder({ dataset: { color, value } }, position, cardStack) {
@@ -78,9 +82,15 @@ function translateCard(srcSlot, targetSlot, card, table) {
         (targetSlot.children.length - 1) * cardGap * 2
     }px)`;
 
+    // NOTE: disabling pointer-events to prevent a card being taken from underneath returned stack
+    [srcSlot, targetSlot].forEach((e) => { e.style.pointerEvents = 'none'; });
+
     table.append(card);
     card.animate({
         transform: [cardTransforms + initialTransform, finalTransform],
         easing: ['ease-in', 'ease-out']
-    }, animationDuration).onfinish = () => targetSlot.append(card);
+    }, animationDuration).onfinish = () => {
+        targetSlot.append(card);
+        [srcSlot, targetSlot].forEach((e) => { e.style = ''; });
+    };
 }

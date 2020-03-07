@@ -33,4 +33,6 @@ function configElement(element, keyValPairs) {
     return element;
 }
 
-function indexOfNode(nodeList, node) { return Array.prototype.indexOf.call(nodeList, node); }
+function indexOfNode(nodeList, node) {
+    return Array.prototype.indexOf.call(nodeList, node);
+}
