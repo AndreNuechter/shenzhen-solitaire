@@ -1,7 +1,7 @@
 import { animationDuration, cardGap } from './constants.js';
 
 const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
-const getTransforms = e => e.getAttribute('transform').replace(...replacerArgs);
+const getTransforms = e => e.getAttribute('transform').replace(...replacerArgs); // FIXME transform may be null
 const stackRules = { // rules for stacking cards on a slot (keys are slot-types)
     dragon: (movedSubStack, slot) => movedSubStack.children.length === 1
         && slot.children.length === 1,
@@ -34,7 +34,6 @@ export {
     areOverlapping,
     canBeMovedHere,
     getTranslateString,
-    hasWon,
     isOutOfOrder,
     shuffleCards,
     translateCard
@@ -53,10 +52,6 @@ function canBeMovedHere(movedSubStack, slot) {
 }
 
 function getTranslateString(x, y) { return `translate(${x},${y})`; }
-
-function hasWon(stackSlots) {
-    return stackSlots.every(s => s.children.length === 1);
-}
 
 // for all but the last card, is its value one less than the next and a different color?
 function isOutOfOrder({ dataset: { color, value } }, position, cardStack) {
@@ -82,7 +77,7 @@ function translateCard(srcSlot, targetSlot, card, table) {
         (targetSlot.children.length - 1) * cardGap * 2
     }px)`;
 
-    // NOTE: disabling pointer-events to prevent a card being taken from underneath returned stack
+    // NOTE: disabling pointer-events to prevent a card being taken from underneath returning stack
     [srcSlot, targetSlot].forEach((e) => { e.style.pointerEvents = 'none'; });
 
     table.append(card);

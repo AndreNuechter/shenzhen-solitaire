@@ -4,7 +4,6 @@ import {
     areOverlapping,
     canBeMovedHere,
     getTranslateString,
-    hasWon,
     isOutOfOrder,
     shuffleCards,
     translateCard
@@ -133,10 +132,6 @@ function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
         cards.forEach(cb);
         movedSubStack.remove();
         window.removeEventListener(eventTypeForMoving, moveCardCb);
-
-        if (hasWon(stackSlots)) {
-            console.log('You\'ve won');
-        }
     }, { once: true });
 }
 
