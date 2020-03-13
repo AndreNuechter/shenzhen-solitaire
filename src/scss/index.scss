@@ -54,6 +54,7 @@ $upper-border-width: 8px;
     background: gold;
     border: 3px solid red;
     animation: circle 5s infinite linear;
+    user-select: none;
 }
 
 @keyframes circle {
@@ -157,7 +158,7 @@ $upper-border-width: 8px;
 }
 
 .dragon-summoning-btn {
-    fill: url('#reflection');
+    fill: url('#button');
     stroke: grey;
     stroke-width: 1;
     cursor: pointer;
@@ -165,5 +166,9 @@ $upper-border-width: 8px;
     text {
         stroke: none;
         transform: translate(-6px, 6px);
+    }
+
+    &.clicked {
+        fill: url('#button-clicked');
     }
 }

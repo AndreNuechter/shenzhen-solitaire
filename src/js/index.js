@@ -16,18 +16,33 @@ import {
     setScalingFactor
 } from './dealer.js';
 
-dragonSummoningBtns.onclick = summonDragons;
+Object.assign(dragonSummoningBtns, {
+    onclick: summonDragons,
+    onpointerdown: visualizeButtonClick,
+    onpointerup: visualizeButtonClick
+});
+resetBtn.onclick = resetTable;
 table.addEventListener('pointerdown', moveCard, { passive: true });
-resetBtn.onclick = () => {
-    winNotification.style.display = '';
-    cardSlots.forEach(c => c.classList.remove('consumed'));
-    cards.forEach(c => c.classList.remove('frozen'));
-    dealCards(cards);
-};
 winNotification.onclick = () => resetBtn.click();
-window.ondblclick = collectCard;
 window.addEventListener('DOMContentLoaded', () => {
     dealCards(cards);
     setScalingFactor();
 });
 window.onresize = setScalingFactor;
+window.ondblclick = collectCard;
+
+// TODO imports
+function visualizeButtonClick({ target, type }) {
+    const btn = target.closest('.dragon-summoning-btn');
+
+    if (!btn) return;
+
+    btn.classList[type.includes('down') ? 'add' : 'remove']('clicked');
+}
+
+function resetTable() {
+    winNotification.style.display = '';
+    cardSlots.forEach(c => c.classList.remove('consumed'));
+    cards.forEach(c => c.classList.remove('frozen'));
+    dealCards(cards);
+}
