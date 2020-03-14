@@ -1,7 +1,6 @@
 /* globals window */
 
 import {
-    cardSlots,
     dragonSummoningBtns,
     resetBtn,
     table,
@@ -12,8 +11,10 @@ import {
     collectCard,
     dealCards,
     moveCard,
+    resetTable,
     summonDragons,
-    setScalingFactor
+    setScalingFactor,
+    visualizeButtonClick
 } from './dealer.js';
 
 Object.assign(dragonSummoningBtns, {
@@ -30,19 +31,3 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 window.onresize = setScalingFactor;
 window.ondblclick = collectCard;
-
-// TODO imports
-function visualizeButtonClick({ target, type }) {
-    const btn = target.closest('.dragon-summoning-btn');
-
-    if (!btn) return;
-
-    btn.classList[type.includes('down') ? 'add' : 'remove']('clicked');
-}
-
-function resetTable() {
-    winNotification.style.display = '';
-    cardSlots.forEach(c => c.classList.remove('consumed'));
-    cards.forEach(c => c.classList.remove('frozen'));
-    dealCards(cards);
-}

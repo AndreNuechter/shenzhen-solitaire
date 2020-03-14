@@ -1,5 +1,6 @@
 /* globals window, document */
 
+import cards from './cards.js';
 import {
     areOverlapping,
     canBeMovedHere,
@@ -10,11 +11,12 @@ import {
 } from './dealer-internals.js';
 import {
     cardSlots,
+    collectionSlots,
     dragonSlots,
+    flowerSlot,
     stackSlots,
     table,
-    flowerSlot,
-    collectionSlots
+    winNotification
 } from './dom-selections.js';
 import { group } from './dom-creations.js';
 import { indexOfNode } from './helper-functions.js';
@@ -32,8 +34,10 @@ export {
     collectCard,
     dealCards,
     moveCard,
+    resetTable,
     setScalingFactor,
-    summonDragons
+    summonDragons,
+    visualizeButtonClick
 };
 
 function collectCard({ x, y }) {
@@ -84,10 +88,10 @@ function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
     // I presume this may be null when clicking on a card being animated
     if (!cardSlotPos) return;
 
-    const cards = [...cardSlot.children]
+    const movedCards = [...cardSlot.children]
         .slice(indexOfNode(cardSlot.children, card));
 
-    if (cards.some(isOutOfOrder)) return;
+    if (movedCards.some(isOutOfOrder)) return;
 
     const movedSubStack = group.cloneNode(false);
     const moveCardCb = (() => {
@@ -111,7 +115,7 @@ function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
     const start = Date.now();
 
     movedSubStack.setAttribute('transform', cardSlotPos);
-    movedSubStack.append(...cards);
+    movedSubStack.append(...movedCards);
     table.append(movedSubStack);
 
     window.addEventListener(eventTypeForMoving, moveCardCb, { passive: true });
@@ -129,10 +133,17 @@ function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
             ? translateCard(movedSubStack, cardSlot, c, table)
             : targetSlot.append(c));
 
-        cards.forEach(cb);
+        movedCards.forEach(cb);
         movedSubStack.remove();
         window.removeEventListener(eventTypeForMoving, moveCardCb);
     }, { once: true });
+}
+
+function resetTable() {
+    winNotification.style.display = '';
+    cardSlots.forEach(c => c.classList.remove('consumed'));
+    cards.forEach(c => c.classList.remove('frozen'));
+    dealCards(cards);
 }
 
 function setScalingFactor() {
@@ -145,17 +156,18 @@ function summonDragons({ target }) {
     if (!btn) return;
 
     const { color: btnColor } = btn.dataset;
-    const reducer = (arr, { children: cards }) => {
-        const { color: cardColor, value } = cards[cards.length - 1].dataset;
+    const reducer = (arr, { children: slottedCards }) => {
+        const { color: cardColor, value } = slottedCards.slice(-1).dataset;
 
         if (cardColor === btnColor && !value) {
-            arr.push(cards[cards.length - 1]);
+            arr.push(slottedCards.slice(-1));
         }
 
         return arr;
     };
-    const predicate = ({ children: cards }) => cards.length === 1
-        || (!cards[1].dataset.value && cards[1].dataset.color === btnColor);
+    // NOTE: we consider a slot free if it's empty or has an appropriately colored dragon already
+    const predicate = ({ children }) => children.length === 1
+        || (!children[1].dataset.value && children[1].dataset.color === btnColor);
     const dragons = [...stackSlots, ...dragonSlots].reduce(reducer, []);
     const freeDragonSlot = dragonSlots.find(predicate);
 
@@ -166,4 +178,12 @@ function summonDragons({ target }) {
             setTimeout(cb(d), 25 * i);
         });
     }
+}
+
+function visualizeButtonClick({ target, type }) {
+    const btn = target.closest('.dragon-summoning-btn');
+
+    if (!btn) return;
+
+    btn.classList[type.includes('down') ? 'add' : 'remove']('clicked');
 }
