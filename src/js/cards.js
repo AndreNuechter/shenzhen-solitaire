@@ -4,9 +4,9 @@ import { group, rect, text } from './dom-creations.js';
 const colors = ['black', 'red', 'green'];
 const symbols = {
     red: '♕',
-    black: '☠',
-    green: '¥',
-    dragon: 'Ω',
+    black: '☣',
+    green: '⚔',
+    dragon: '☠',
     flower: '💮'
 };
 const cardTemplate = (color, value) => {

@@ -7,7 +7,8 @@ import {
     getTranslateString,
     isOutOfOrder,
     shuffleCards,
-    translateCard
+    translateCard,
+    measureOverlap
 } from './dealer-internals.js';
 import {
     cardSlots,
@@ -125,8 +126,16 @@ function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
         const boundingRectOfMoved = movedSubStack.getBoundingClientRect();
         const predicate = ([slot, rect]) => areOverlapping(boundingRectOfMoved, rect)
             && canBeMovedHere(movedSubStack, slot);
-        const overlapping = boundinRectsOfSlots.find(predicate);
-        const targetSlot = overlapping ? overlapping[0] : cardSlot;
+        const availableOverlappingSlots = boundinRectsOfSlots.filter(predicate);
+        const index = (() => {
+            const overlaps = availableOverlappingSlots
+                .map(([, boundingRectOfOverlapping]) => measureOverlap(
+                    boundingRectOfMoved, boundingRectOfOverlapping
+                ));
+            const maxOverlap = Math.max(...overlaps);
+            return overlaps.findIndex(v => v === maxOverlap);
+        })();
+        const targetSlot = availableOverlappingSlots.length ? availableOverlappingSlots[index][0] : cardSlot;
         // NOTE: checking time to not break dblclick
         const end = Date.now() - start;
         const cb = c => (targetSlot === cardSlot && end > animationDuration
@@ -157,10 +166,10 @@ function summonDragons({ target }) {
 
     const { color: btnColor } = btn.dataset;
     const reducer = (arr, { children: slottedCards }) => {
-        const { color: cardColor, value } = slottedCards.slice(-1).dataset;
+        const { color: cardColor, value } = slottedCards[slottedCards.length - 1].dataset;
 
         if (cardColor === btnColor && !value) {
-            arr.push(slottedCards.slice(-1));
+            arr.push(slottedCards[slottedCards.length - 1]);
         }
 
         return arr;

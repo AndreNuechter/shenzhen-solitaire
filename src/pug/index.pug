@@ -47,7 +47,7 @@ html(lang="en")
                             r=circleRadius)
                         text(fill=color
                             x=circleRadius 
-                            y=((circleRadius * 2 + cardGap) * i)) Ω
+                            y=((circleRadius * 2 + cardGap) * i)) ☠
 
             each _, i in new Array(3)
                 g.card-slot(transform=`translate(${(cardWidth + cardGap) * (i + 5)},0)` data-slot-type="collection")
@@ -59,16 +59,22 @@ html(lang="en")
 
         svg(width="0" height="0" style="position: absolute")
             defs
-                linearGradient#button(gradientTransform="rotate(90)")
-                    stop(offset="5%" stop-color="grey")
-                    stop(offset="95%" stop-color="whitesmoke")
-                linearGradient#button-clicked(gradientTransform="rotate(90)")
-                    stop(offset="5%" stop-color="whitesmoke")
-                    stop(offset="95%" stop-color="grey")
                 filter#texture(x="0" y="0" width="100%" height="100%")
                     feTurbulence(type="fractalNoise" baseFrequency="1" result="noise" numOctaves="1")
                     feSpecularLighting(in="noise" lighting-color="forestgreen" surfaceScale="4")
                         feDistantLight(azimuth="45" elevation="10")
-                pattern#card-backside(viewBox="-5,0,20,10" width="20%" height="20%")
-                    rect(x="-15" y="-10" width="40" height="40" fill="#FFD700")
-                    polygon(points="0,0 2,5 0,10 5,8 10,10 8,5 10,0 5,2" fill="#f00" stroke="#000")
+                linearGradient#button(gradientTransform="rotate(90)")
+                    stop(offset="5%" stop-color="grey")
+                    stop(offset="95%" stop-color="whitesmoke")
+                linearGradient#button-clicked(gradientTransform="rotate(90)")
+                    stop(offset="5%" stop-color="lightgrey")
+                    stop(offset="95%" stop-color="grey")
+                linearGradient#card-backside-pt1
+                    stop(offset="40%" stop-color="gold")
+                    stop(offset="95%" stop-color="red")
+                linearGradient#card-backside-pt2(gradientTransform="rotate(25)")
+                    stop(offset="40%" stop-color="transparent")
+                    stop(offset="95%" stop-color="red")
+                pattern#card-backside(viewBox="1 1 5 5" width="20%" height="20%")
+                    rect(x="0" y="0" width="10" height="10" fill="url('#card-backside-pt1')")
+                    rect(x="0" y="0" width="10" height="10" fill="url('#card-backside-pt2')")

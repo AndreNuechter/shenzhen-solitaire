@@ -35,6 +35,7 @@ export {
     canBeMovedHere,
     getTranslateString,
     isOutOfOrder,
+    measureOverlap,
     shuffleCards,
     translateCard
 };
@@ -57,6 +58,29 @@ function getTranslateString(x, y) { return `translate(${x},${y})`; }
 function isOutOfOrder({ dataset: { color, value } }, position, cardStack) {
     return position < (cardStack.length - 1)
         && (+cardStack[position + 1].dataset.value !== value - 1 || cardStack[position + 1].dataset.color === color);
+}
+
+function measureOverlap(a, b) {
+    const {
+        x: x1,
+        y: y1,
+        width: width1,
+        height: height1
+    } = a;
+    const {
+        x: x2,
+        y: y2,
+        width: width2,
+        height: height2
+    } = b;
+    const [start, end] = (() => {
+        if (x1 > x2 && y1 > y2) return [{ x: x1, y: y1 }, { x: x2 + width2, y: y2 + height2 }];
+        if (x1 < x2 && y1 > y2) return [{ x: x2, y: y1 }, { x: x1 + width1, y: y2 + height2 }];
+        if (x1 > x2 && y1 < y2) return [{ x: x1, y: y2 }, { x: x2 + width2, y: y1 + height1 }];
+        return [{ x: x2, y: y2 }, { x: x1 + width1, y: y1 + height1 }];
+    })();
+
+    return (end.x - start.x) * (end.y - start.y);
 }
 
 function shuffleCards(deck) {
