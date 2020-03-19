@@ -35,10 +35,7 @@ html(lang="en")
                 g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},0)` data-slot-type="dragon")
                     rect(x=0 y=0 rx=5)
             
-            g.card-slot(transform=`translate(${(cardWidth + cardGap * 2) * 3},0)` data-slot-type="flower")
-                rect(x=0 y=0 rx=5)
-
-            g#dragon-summoning-btns(transform=`translate(${(cardWidth + cardGap * 2) * 4},${circleRadius + cardGap})`)
+            g#dragon-summoning-btns(transform=`translate(${(cardWidth + cardGap) * 3 + cardGap},${circleRadius + cardGap})`)
                 each color, i in ['black', 'green', 'red']
                     g.dragon-summoning-btn(data-color=color)
                         circle(
@@ -49,12 +46,15 @@ html(lang="en")
                             x=circleRadius 
                             y=((circleRadius * 2 + cardGap) * i)) ☠
 
+            g.card-slot(transform=`translate(${(cardWidth + cardGap) * 3.5},0)` data-slot-type="flower")
+                rect(x=0 y=0 rx=5)
+
             each _, i in new Array(3)
                 g.card-slot(transform=`translate(${(cardWidth + cardGap) * (i + 5)},0)` data-slot-type="collection")
                     rect(x=0 y=0 rx=5)
 
             each _, i in new Array(8)
-                g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap * 3})` data-slot-type="stacking")
+                g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap})` data-slot-type="stacking")
                     rect(x=0 y=0 rx=5)
 
         svg(width="0" height="0" style="position: absolute")
