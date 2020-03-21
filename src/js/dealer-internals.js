@@ -93,10 +93,11 @@ function shuffleCards(deck) {
 function translateCard(srcSlot, targetSlot, card, table) {
     const cardTransforms = getTransforms(card);
     const initialTransform = getTransforms(srcSlot);
+    // NOTE: cards returing to stackslot should translate down (to the top of the stack)
     const finalTransform = `${
         getTransforms(targetSlot)
     }translateY(${
-        (targetSlot.children.length - 1) * cardGap * 2
+        (targetSlot.children.length - 1) * cardGap * 2 * Number(targetSlot.dataset.slotType === 'stacking')
     }px)`;
 
     // NOTE: disabling pointer-events to prevent a card being taken from underneath returning stack
