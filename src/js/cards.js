@@ -1,5 +1,10 @@
 import { configClone } from './helper-functions.js';
-import { group, rect, text } from './dom-creations.js';
+import {
+    group,
+    rect,
+    text,
+    use
+} from './dom-creations.js';
 
 const colors = ['black', 'red', 'green'];
 const symbols = {
@@ -14,15 +19,54 @@ const cardTemplate = (color, value) => {
         class: 'card'
     });
     const cardBoard = rect.cloneNode(false);
-    const cardFace = configClone(text)({
-        x: 8,
-        y: 16
-    });
-    cardFace.textContent = (() => {
-        if (color && value === '') return symbols.dragon;
-        if (color) return `${symbols[color]} ${value + 1}`;
-        return symbols.flower;
+    const cardFace = (() => {
+        if (color && value === '') {
+            const wrapper = group.cloneNode(false);
+            const topCornerIcon = configClone(use)({
+                x: 8,
+                y: 4,
+                width: '16px',
+                height: '16px',
+                href: '#skull',
+                stroke: color,
+                fill: color
+            });
+            const bottomCornerIcon = configClone(use)({
+                x: 105,
+                y: 160,
+                width: '16px',
+                height: '16px',
+                href: '#skull',
+                stroke: color,
+                fill: color
+            });
+            const centerIcon = configClone(use)({
+                x: 30,
+                y: 60,
+                width: '64px',
+                height: '64px',
+                href: '#skull',
+                stroke: color,
+                fill: color
+            });
+
+            wrapper.append(topCornerIcon, centerIcon, bottomCornerIcon);
+            return wrapper;
+        }
+
+        const face = configClone(text)({
+            x: 8,
+            y: 16
+        });
+        face.textContent = (() => {
+            if (color && value === '') return symbols.dragon;
+            if (color) return `${symbols[color]} ${value + 1}`;
+            return symbols.flower;
+        })();
+
+        return face;
     })();
+
     card.append(cardBoard, cardFace);
     Object.assign(card.dataset, { color, value });
     return card;

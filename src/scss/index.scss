@@ -19,6 +19,16 @@ html {
     }
 }
 
+#skull {
+    path {
+        fill-opacity: 0;
+    }
+
+    path.filled-path {
+        fill-opacity: 1;
+    }
+}
+
 g[data-color="black"] {
     text {
         fill: black;

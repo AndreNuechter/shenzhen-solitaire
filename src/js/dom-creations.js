@@ -7,11 +7,13 @@ import {
 } from './constants.js';
 
 const group = document.createElementNS(ns, 'g');
-const text = document.createElementNS(ns, 'text');
 const rect = configElement(document.createElementNS(ns, 'rect'), cardDefaults);
+const text = document.createElementNS(ns, 'text');
+const use = document.createElementNS(ns, 'use');
 
 export {
     group,
     rect,
-    text
+    text,
+    use
 };
