@@ -134,8 +134,9 @@ $upper-border-width: 8px;
         .card.frozen {
             animation: flip-over .5s ease 1 forwards;
 
-            text {
-                animation: fade .5s ease 1 forwards;
+            text,
+            g {
+                animation: fade .2s ease 1 forwards;
             }
         }
     }

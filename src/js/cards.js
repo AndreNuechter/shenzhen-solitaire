@@ -22,35 +22,29 @@ const cardTemplate = (color, value) => {
     const cardFace = (() => {
         if (color && value === '') {
             const wrapper = group.cloneNode(false);
-            const topCornerIcon = configClone(use)({
-                x: 8,
-                y: 4,
+            const skullTmpl = configClone(use)({
                 width: '16px',
                 height: '16px',
                 href: '#skull',
                 stroke: color,
                 fill: color
             });
-            const bottomCornerIcon = configClone(use)({
-                x: 105,
-                y: 160,
-                width: '16px',
-                height: '16px',
-                href: '#skull',
-                stroke: color,
-                fill: color
+            const topCornerIcon = configClone(skullTmpl)({
+                x: '4px',
+                y: '4px'
             });
-            const centerIcon = configClone(use)({
-                x: 30,
-                y: 60,
+            const bottomCornerIcon = configClone(skullTmpl)({
+                x: '109px',
+                y: '160px'
+            });
+            const centerIcon = configClone(skullTmpl)({
+                x: '32px',
+                y: '60px',
                 width: '64px',
-                height: '64px',
-                href: '#skull',
-                stroke: color,
-                fill: color
+                height: '64px'
             });
 
-            wrapper.append(topCornerIcon, centerIcon, bottomCornerIcon);
+            wrapper.append(topCornerIcon, bottomCornerIcon, centerIcon);
             return wrapper;
         }
 
@@ -58,12 +52,8 @@ const cardTemplate = (color, value) => {
             x: 8,
             y: 16
         });
-        face.textContent = (() => {
-            if (color && value === '') return symbols.dragon;
-            if (color) return `${symbols[color]} ${value + 1}`;
-            return symbols.flower;
-        })();
 
+        face.textContent = color ? `${symbols[color]} ${value + 1}` : symbols.flower;
         return face;
     })();
 
