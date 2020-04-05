@@ -1,13 +1,19 @@
 /* globals MutationObserver */
 
 import { cardGap } from './constants.js';
-import { cardSlots, consumedSlots, winNotification } from './dom-selections.js';
+import {
+    cardSlots,
+    consumedSlots,
+    scoreDisplay,
+    winNotification
+} from './dom-selections.js';
 import { indexOfNode } from './helper-functions.js';
 import scoreCounter from './score-counter.js';
 
 const checkForWin = () => {
     if (consumedSlots.length === 7) {
         scoreCounter.score += 1;
+        scoreDisplay.textContent = `${scoreCounter.score} times so far!`;
         winNotification.style.display = 'block';
     }
 };
