@@ -85,18 +85,18 @@ function dealCards(deck) {
 function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
     if (!card.classList.contains('card') || moving) return;
 
-    moving = true;
-
     const cardSlot = card.parentNode;
     const cardSlotPos = cardSlot.getAttribute('transform');
 
-    // I presume this may be null when clicking on a card being animated
+    // NOTE: I presume this may be null when clicking on a card being animated
     if (!cardSlotPos) return;
 
     const movedCards = [...cardSlot.children]
         .slice(indexOfNode(cardSlot.children, card));
 
     if (movedCards.some(isOutOfOrder)) return;
+
+    moving = true;
 
     const movedSubStack = group.cloneNode(false);
     const moveCardCb = (() => {
