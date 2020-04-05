@@ -30,6 +30,8 @@ import {
 } from './constants.js';
 
 let scalingFactor;
+// NOTE: to minimize issues w multiple pointers
+let moving = false;
 
 export {
     collectCard,
@@ -81,7 +83,9 @@ function dealCards(deck) {
 }
 
 function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
-    if (!card.classList.contains('card')) return;
+    if (!card.classList.contains('card') || moving) return;
+
+    moving = true;
 
     const cardSlot = card.parentNode;
     const cardSlotPos = cardSlot.getAttribute('transform');
@@ -145,6 +149,7 @@ function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
         movedCards.forEach(cb);
         movedSubStack.remove();
         window.removeEventListener(eventTypeForMoving, moveCardCb);
+        moving = false;
     }, { once: true });
 }
 

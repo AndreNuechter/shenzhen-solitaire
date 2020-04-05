@@ -6,13 +6,49 @@ import {
     use
 } from './dom-creations.js';
 
-const colors = ['black', 'red', 'green'];
-const symbols = {
+const symbols = { // TODO change chars to ids
     red: '♕',
-    black: '☣',
-    green: '⚔',
-    dragon: '☠',
+    black: '#war',
+    green: '#biohazard',
+    dragon: '☠', // '#skull'
     flower: '💮'
+};
+const cardFaceTmpl = (id, color, value) => {
+    const wrapper = group.cloneNode(false);
+    const icon = configClone(use)({
+        width: '16px',
+        height: '16px',
+        href: id,
+        stroke: color,
+        fill: color
+    });
+    const topCornerIcon = configClone(icon)({
+        x: '4px',
+        y: '4px'
+    });
+    const bottomCornerIcon = configClone(icon)({
+        x: '109px',
+        y: '160px'
+    });
+    const centerIcon = configClone(icon)({
+        x: '32px',
+        y: '60px',
+        width: '64px',
+        height: '64px'
+    });
+    const topCornerText = configClone(text)({
+        x: '24px',
+        y: '16px',
+        textContent: value
+    });
+    const bottomCornerText = configClone(text)({
+        x: '96px',
+        y: '173px',
+        textContent: value
+    });
+
+    wrapper.append(topCornerIcon, bottomCornerIcon, centerIcon, topCornerText, bottomCornerText);
+    return wrapper;
 };
 const cardTemplate = (color, value) => {
     const card = configClone(group)({
@@ -21,39 +57,18 @@ const cardTemplate = (color, value) => {
     const cardBoard = rect.cloneNode(false);
     const cardFace = (() => {
         if (color && value === '') {
-            const wrapper = group.cloneNode(false);
-            const skullTmpl = configClone(use)({
-                width: '16px',
-                height: '16px',
-                href: '#skull',
-                stroke: color,
-                fill: color
-            });
-            const topCornerIcon = configClone(skullTmpl)({
-                x: '4px',
-                y: '4px'
-            });
-            const bottomCornerIcon = configClone(skullTmpl)({
-                x: '109px',
-                y: '160px'
-            });
-            const centerIcon = configClone(skullTmpl)({
-                x: '32px',
-                y: '60px',
-                width: '64px',
-                height: '64px'
-            });
-
-            wrapper.append(topCornerIcon, bottomCornerIcon, centerIcon);
-            return wrapper;
+            return cardFaceTmpl('#skull', color);
+        }
+        if (color === 'black' || color === 'green') {
+            return cardFaceTmpl(symbols[color], color, value + 1);
         }
 
         const face = configClone(text)({
-            x: 8,
-            y: 16
+            textContent: color ? `${symbols[color]} ${value + 1}` : symbols.flower,
+            x: '8px',
+            y: '16px'
         });
 
-        face.textContent = color ? `${symbols[color]} ${value + 1}` : symbols.flower;
         return face;
     })();
 
@@ -62,7 +77,7 @@ const cardTemplate = (color, value) => {
     return card;
 };
 // NOTE: values 0-8 are for normal cards, dragons have no value and the flower has neither color nor value
-const cards = colors
+const cards = ['black', 'red', 'green']
     .flatMap(color => Array
         .from({ length: 13 },
             (_, i) => cardTemplate(color, i <= 8 ? i : '')));
