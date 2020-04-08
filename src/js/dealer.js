@@ -44,9 +44,9 @@ export {
 };
 
 function collectCard({ x, y }) {
-    const card = document.elementFromPoint(x, y).parentElement;
+    const card = document.elementFromPoint(x, y).closest('.card');
 
-    if (!card.classList.contains('card')) return;
+    if (!card) return;
 
     const srcSlot = card.parentElement;
 
@@ -82,8 +82,12 @@ function dealCards(deck) {
         .forEach((card, i) => stackSlots[i % 8].append(card));
 }
 
-function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
-    if (!card.classList.contains('card') || moving) return;
+function moveCard({ target, x: x1, y: y1 }) {
+    if (moving) return;
+
+    const card = target.closest('.card');
+
+    if (!card) return;
 
     const cardSlot = card.parentNode;
     const cardSlotPos = cardSlot.getAttribute('transform');
@@ -117,6 +121,7 @@ function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
                 ));
         };
     })();
+    // NOTE: checking time to not break dblclick
     const start = Date.now();
 
     movedSubStack.setAttribute('transform', cardSlotPos);
@@ -140,9 +145,8 @@ function moveCard({ target: { parentNode: card }, x: x1, y: y1 }) {
             return overlaps.findIndex(v => v === maxOverlap);
         })();
         const targetSlot = availableOverlappingSlots.length ? availableOverlappingSlots[index][0] : cardSlot;
-        // NOTE: checking time to not break dblclick
-        const end = Date.now() - start;
-        const cb = c => (targetSlot === cardSlot && end > animationDuration
+        const moveDuration = Date.now() - start;
+        const cb = c => (targetSlot === cardSlot && moveDuration > animationDuration
             ? translateCard(movedSubStack, cardSlot, c, table)
             : targetSlot.append(c));
 
