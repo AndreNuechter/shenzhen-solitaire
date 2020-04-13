@@ -26,6 +26,6 @@
     },
     "scripts": {
         "gulp": "gulp",
-        "prod": "gulp bundle"
+        "build": "gulp bundle"
     }
 }
