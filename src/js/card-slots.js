@@ -18,8 +18,6 @@ const checkForWin = () => {
     }
 };
 const stackCard = (node, offset) => node.setAttribute('transform', `translate(0,${offset * cardGap * 2})`);
-// NOTE: the 1st child of cardSlot is the slot itself (a rect)
-const offsetOfAddedCard = (id, offset) => (id < 0 ? offset : id - 1);
 const basicAdditionHandler = ({ addedNodes: [card] }) => {
     card.removeAttribute('transform');
     card.classList.add('frozen');
@@ -50,11 +48,16 @@ const observers = {
         }
     },
     stacking: slot => (mutations) => {
-        mutations.forEach(({ addedNodes: addedCards }, offset) => {
-            addedCards.forEach(card => stackCard(
-                card,
-                offsetOfAddedCard(indexOfNode(slot.children, card), offset)
-            ));
+        // NOTE: to keep a returning substack from collapsing, eg when clicked multiple times
+        if (mutations.length === 2 && mutations[0].removedNodes[0] === mutations[1].addedNodes[0]) return;
+
+        mutations.forEach(({ addedNodes: addedCards }) => {
+            addedCards.forEach((card) => {
+                stackCard(
+                    card,
+                    indexOfNode(slot.children, card) - 1
+                );
+            });
         });
     }
 };

@@ -83,6 +83,7 @@ $upper-border-width: 8px;
     margin: 0 auto;
     background: forestgreen;
     user-select: none;
+    touch-action: none;
 }
 
 .card {

@@ -89,45 +89,39 @@ function moveCard({ target, x: x1, y: y1 }) {
 
     if (!card) return;
 
-    const cardSlot = card.parentNode;
-    const cardSlotPos = cardSlot.getAttribute('transform');
+    const srcSlot = card.parentNode;
 
-    // NOTE: I presume this may be null when clicking on a card being animated
-    if (!cardSlotPos) return;
+    if (!srcSlot.classList.contains('card-slot')) return;
 
-    const movedCards = [...cardSlot.children]
-        .slice(indexOfNode(cardSlot.children, card));
+    const srcSlotPos = srcSlot.getAttribute('transform');
+    const movedCards = [...srcSlot.children]
+        .slice(indexOfNode(srcSlot.children, card));
 
     if (movedCards.some(isOutOfOrder)) return;
 
-    moving = true;
-
+    // NOTE: checking time to not break dblclick
+    const start = Date.now();
     const movedSubStack = group.cloneNode(false);
-    const moveCardCb = (() => {
-        if (onTouchDevice) {
-            return ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
-                movedSubStack
-                    .setAttribute('transform', cardSlotPos + getTranslateString(
-                        (x2 - x1) * scalingFactor,
-                        (y2 - y1) * scalingFactor
-                    ));
-            };
-        }
-        return ({ x: x2, y: y2 }) => {
+    const moveCardCb = (onTouchDevice)
+        ? ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
             movedSubStack
-                .setAttribute('transform', cardSlotPos + getTranslateString(
+                .setAttribute('transform', srcSlotPos + getTranslateString(
+                    (x2 - x1) * scalingFactor,
+                    (y2 - y1) * scalingFactor
+                ));
+        }
+        : ({ x: x2, y: y2 }) => {
+            movedSubStack
+                .setAttribute('transform', srcSlotPos + getTranslateString(
                     (x2 - x1) * scalingFactor,
                     (y2 - y1) * scalingFactor
                 ));
         };
-    })();
-    // NOTE: checking time to not break dblclick
-    const start = Date.now();
 
-    movedSubStack.setAttribute('transform', cardSlotPos);
+    movedSubStack.setAttribute('transform', srcSlotPos);
     movedSubStack.append(...movedCards);
     table.append(movedSubStack);
-
+    moving = true;
     window.addEventListener(eventTypeForMoving, moveCardCb, { passive: true });
     window.addEventListener(eventTypeForStopMoving, () => {
         const getRects = slot => [slot, slot.getBoundingClientRect()];
@@ -144,21 +138,23 @@ function moveCard({ target, x: x1, y: y1 }) {
             const maxOverlap = Math.max(...overlaps);
             return overlaps.findIndex(v => v === maxOverlap);
         })();
-        const targetSlot = availableOverlappingSlots.length ? availableOverlappingSlots[index][0] : cardSlot;
+        const targetSlot = availableOverlappingSlots.length ? availableOverlappingSlots[index][0] : srcSlot;
         const moveDuration = Date.now() - start;
-        const cb = c => (targetSlot === cardSlot && moveDuration > animationDuration
-            ? translateCard(movedSubStack, cardSlot, c, table)
+        const animateCard = targetSlot === srcSlot && moveDuration > animationDuration;
+        const cb = c => (animateCard
+            ? translateCard(movedSubStack, srcSlot, c, table)
             : targetSlot.append(c));
 
         movedCards.forEach(cb);
-        movedSubStack.remove();
         window.removeEventListener(eventTypeForMoving, moveCardCb);
+        movedSubStack.remove();
         moving = false;
     }, { once: true });
 }
 
 function resetTable() {
     winNotification.style.display = '';
+    moving = false; // FIXME: only a band-aid. What is happening to prevent touchend?
     cardSlots.forEach(c => c.classList.remove('consumed'));
     cards.forEach(c => c.classList.remove('frozen'));
     dealCards(cards);
