@@ -13,19 +13,16 @@ import {
 import {
     cardSlots,
     collectionSlots,
+    dealersHand,
     dragonSlots,
     flowerSlot,
     stackSlots,
     table,
     winNotification
 } from './dom-selections.js';
-import { group } from './dom-creations.js';
 import { indexOfNode } from './helper-functions.js';
 import {
     animationDuration,
-    eventTypeForMoving,
-    eventTypeForStopMoving,
-    onTouchDevice,
     width
 } from './constants.js';
 
@@ -82,53 +79,48 @@ function dealCards(deck) {
         .forEach((card, i) => stackSlots[i % 8].append(card));
 }
 
-function moveCard({ target, x: x1, y: y1 }) {
+// TODO: settle this
+window.onpointercancel = (e) => {
+    console.log(e);
+};
+const move = (x1, y1, srcSlotPos) => ({ x: x2, y: y2 }) => {
+    dealersHand
+        .setAttribute('transform', `${srcSlotPos}${getTranslateString(
+            (x2 - x1) * scalingFactor,
+            (y2 - y1) * scalingFactor
+        )}`);
+};
+
+function moveCard({
+    target,
+    x: x1,
+    y: y1,
+    pointerId
+}) {
     if (moving) return;
-
     const card = target.closest('.card');
-
     if (!card) return;
-
     const srcSlot = card.parentNode;
-
     if (!srcSlot.classList.contains('card-slot')) return;
-
     const srcSlotPos = srcSlot.getAttribute('transform');
     const movedCards = [...srcSlot.children]
         .slice(indexOfNode(srcSlot.children, card));
-
     if (movedCards.some(isOutOfOrder)) return;
-
     // NOTE: checking time to not break dblclick
     const start = Date.now();
-    const movedSubStack = group.cloneNode(false);
-    const moveCardCb = (onTouchDevice)
-        ? ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
-            movedSubStack
-                .setAttribute('transform', srcSlotPos + getTranslateString(
-                    (x2 - x1) * scalingFactor,
-                    (y2 - y1) * scalingFactor
-                ));
-        }
-        : ({ x: x2, y: y2 }) => {
-            movedSubStack
-                .setAttribute('transform', srcSlotPos + getTranslateString(
-                    (x2 - x1) * scalingFactor,
-                    (y2 - y1) * scalingFactor
-                ));
-        };
+    const moveCb = move(x1, y1, srcSlotPos);
 
-    movedSubStack.setAttribute('transform', srcSlotPos);
-    movedSubStack.append(...movedCards);
-    table.append(movedSubStack);
     moving = true;
-    window.addEventListener(eventTypeForMoving, moveCardCb, { passive: true });
-    window.addEventListener(eventTypeForStopMoving, () => {
+    dealersHand.setAttribute('transform', srcSlotPos);
+    dealersHand.append(...movedCards);
+    // table.setPointerCapture(pointerId);
+    table.addEventListener('pointermove', moveCb, { passive: true });
+    table.addEventListener('pointerup', (e) => {
         const getRects = slot => [slot, slot.getBoundingClientRect()];
         const boundinRectsOfSlots = cardSlots.map(getRects);
-        const boundingRectOfMoved = movedSubStack.getBoundingClientRect();
+        const boundingRectOfMoved = dealersHand.getBoundingClientRect();
         const predicate = ([slot, rect]) => areOverlapping(boundingRectOfMoved, rect)
-            && canBeMovedHere(movedSubStack, slot);
+            && canBeMovedHere(dealersHand, slot);
         const availableOverlappingSlots = boundinRectsOfSlots.filter(predicate);
         const index = (() => {
             const overlaps = availableOverlappingSlots
@@ -138,23 +130,25 @@ function moveCard({ target, x: x1, y: y1 }) {
             const maxOverlap = Math.max(...overlaps);
             return overlaps.findIndex(v => v === maxOverlap);
         })();
-        const targetSlot = availableOverlappingSlots.length ? availableOverlappingSlots[index][0] : srcSlot;
+        const targetSlot = availableOverlappingSlots.length
+            ? availableOverlappingSlots[index][0]
+            : srcSlot;
         const moveDuration = Date.now() - start;
         const animateCard = targetSlot === srcSlot && moveDuration > animationDuration;
-        const cb = c => (animateCard
-            ? translateCard(movedSubStack, srcSlot, c, table)
+        const returnCard = c => (false && animateCard
+            ? translateCard(dealersHand, srcSlot, c, table)
             : targetSlot.append(c));
 
-        movedCards.forEach(cb);
-        window.removeEventListener(eventTypeForMoving, moveCardCb);
-        movedSubStack.remove();
+        movedCards.forEach(returnCard);
+        table.removeEventListener('pointermove', moveCb);
+        // table.releasePointerCapture(e.pointerId);
         moving = false;
     }, { once: true });
 }
 
 function resetTable() {
     winNotification.style.display = '';
-    moving = false; // FIXME: only a band-aid. What is happening to prevent touchend?
+    moving = false; // FIXME: only a band-aid. What is happening to prevent pointerup?
     cardSlots.forEach(c => c.classList.remove('consumed'));
     cards.forEach(c => c.classList.remove('frozen'));
     dealCards(cards);
@@ -171,7 +165,10 @@ function summonDragons({ target }) {
 
     const { color: btnColor } = btn.dataset;
     const reducer = (arr, { children: slottedCards }) => {
-        const { color: cardColor, value } = slottedCards[slottedCards.length - 1].dataset;
+        const {
+            color: cardColor,
+            value
+        } = slottedCards[slottedCards.length - 1].dataset;
 
         if (cardColor === btnColor && !value) {
             arr.push(slottedCards[slottedCards.length - 1]);
@@ -186,18 +183,21 @@ function summonDragons({ target }) {
     const freeDragonSlot = dragonSlots.find(predicate);
 
     if (dragons.length === 4 && freeDragonSlot) {
-        const cb = d => translateCard(d.parentElement, freeDragonSlot, d, table);
-        dragons.forEach((d, i) => {
+        const cb = (d, i) => {
             d.classList.add('frozen');
-            setTimeout(cb(d), 25 * i);
-        });
+            setTimeout(
+                () => translateCard(d.parentElement, freeDragonSlot, d, table),
+                25 * i
+            );
+        };
+        dragons.forEach(cb);
     }
 }
 
-function visualizeButtonClick({ target, type }) {
+function visualizeButtonClick({ target }) {
     const btn = target.closest('.dragon-summoning-btn');
 
     if (!btn) return;
 
-    btn.classList[type.includes('down') ? 'add' : 'remove']('clicked');
+    btn.classList.toggle('clicked');
 }

@@ -3,6 +3,7 @@
 const cardSlots = [...document.getElementsByClassName('card-slot')];
 const collectionSlots = [...document.querySelectorAll('[data-slot-type="collection"]')];
 const consumedSlots = document.getElementsByClassName('consumed');
+const dealersHand = document.getElementById('dealers-hand');
 const dragonSlots = [...document.querySelectorAll('[data-slot-type="dragon"]')];
 const dragonSummoningBtns = document.getElementById('dragon-summoning-btns');
 const flowerSlot = document.querySelector('[data-slot-type="flower"]');
@@ -16,6 +17,7 @@ export {
     cardSlots,
     collectionSlots,
     consumedSlots,
+    dealersHand,
     dragonSlots,
     dragonSummoningBtns,
     flowerSlot,

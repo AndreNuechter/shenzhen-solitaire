@@ -1,5 +1,10 @@
 :root {
     --border-color: rgba(122, 87, 119, 0.7);
+    touch-action: none;
+
+    * {
+        touch-action: none;
+    }
 }
 
 body,
