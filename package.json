@@ -26,6 +26,7 @@
     },
     "scripts": {
         "gulp": "gulp",
-        "build": "gulp bundle"
+        "build": "gulp bundle",
+        "deploy": "gulp bundle && git add . && git commit -m \"Build\" && git push --all"
     }
 }
