@@ -149,7 +149,7 @@ function moveCard({
 
 function resetTable() {
     winNotification.style.display = '';
-    moving = false; // FIXME: only a band-aid. What is happening to prevent pointerup?
+    moving = false; // FIXME: only a band-aid. What is happening to prevent [move]up?
     cardSlots.forEach(c => c.classList.remove('consumed'));
     cards.forEach(c => c.classList.remove('frozen'));
     dealCards(cards);

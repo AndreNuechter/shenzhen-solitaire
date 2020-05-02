@@ -6,12 +6,12 @@ import {
     use
 } from './dom-creations.js';
 
-const symbols = { // TODO change chars to ids
-    red: '♕',
+const symbols = {
+    red: '#famine',
     black: '#war',
     green: '#biohazard',
-    dragon: '☠', // '#skull'
-    flower: '💮'
+    dragon: '#skull',
+    flower: '#flower'
 };
 const cardFaceTmpl = (id, color, value) => {
     const wrapper = group.cloneNode(false);
@@ -57,19 +57,13 @@ const cardTemplate = (color, value) => {
     const cardBoard = rect.cloneNode(false);
     const cardFace = (() => {
         if (color && value === '') {
-            return cardFaceTmpl('#skull', color);
+            return cardFaceTmpl(symbols.dragon, color);
         }
-        if (color === 'black' || color === 'green') {
+        if (color) {
             return cardFaceTmpl(symbols[color], color, value + 1);
         }
 
-        const face = configClone(text)({
-            textContent: color ? `${symbols[color]} ${value + 1}` : symbols.flower,
-            x: '8px',
-            y: '16px'
-        });
-
-        return face;
+        return cardFaceTmpl(symbols.flower, 'hotpink');
     })();
 
     card.append(cardBoard, cardFace);
