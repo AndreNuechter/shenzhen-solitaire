@@ -1,4 +1,4 @@
-/* globals window, document */
+/* globals document */
 
 import cards from './cards.js';
 import {
@@ -23,9 +23,25 @@ import {
 import { indexOfNode } from './helper-functions.js';
 import {
     animationDuration,
-    width
+    width,
+    moveEvents
 } from './constants.js';
 
+const move = (x1, y1, srcSlotPos, scalingFactor) => (moveEvents[0].includes('touch')
+    ? ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
+        dealersHand
+            .setAttribute('transform', `${srcSlotPos}${getTranslateString(
+                (x2 - x1) * scalingFactor,
+                (y2 - y1) * scalingFactor
+            )}`);
+    }
+    : ({ x: x2, y: y2 }) => {
+        dealersHand
+            .setAttribute('transform', `${srcSlotPos}${getTranslateString(
+                (x2 - x1) * scalingFactor,
+                (y2 - y1) * scalingFactor
+            )}`);
+    });
 let scalingFactor;
 // NOTE: to minimize issues w multiple pointers
 let moving = false;
@@ -79,23 +95,10 @@ function dealCards(deck) {
         .forEach((card, i) => stackSlots[i % 8].append(card));
 }
 
-// TODO: settle this
-window.onpointercancel = (e) => {
-    console.log(e);
-};
-const move = (x1, y1, srcSlotPos) => ({ x: x2, y: y2 }) => {
-    dealersHand
-        .setAttribute('transform', `${srcSlotPos}${getTranslateString(
-            (x2 - x1) * scalingFactor,
-            (y2 - y1) * scalingFactor
-        )}`);
-};
-
 function moveCard({
     target,
     x: x1,
-    y: y1,
-    pointerId
+    y: y1
 }) {
     if (moving) return;
     const card = target.closest('.card');
@@ -108,14 +111,13 @@ function moveCard({
     if (movedCards.some(isOutOfOrder)) return;
     // NOTE: checking time to not break dblclick
     const start = Date.now();
-    const moveCb = move(x1, y1, srcSlotPos);
+    const moveCb = move(x1, y1, srcSlotPos, scalingFactor);
 
     moving = true;
     dealersHand.setAttribute('transform', srcSlotPos);
     dealersHand.append(...movedCards);
-    // table.setPointerCapture(pointerId);
-    table.addEventListener('pointermove', moveCb, { passive: true });
-    table.addEventListener('pointerup', (e) => {
+    table.addEventListener(moveEvents[0], moveCb, { passive: true });
+    table.addEventListener(moveEvents[1], () => {
         const getRects = slot => [slot, slot.getBoundingClientRect()];
         const boundinRectsOfSlots = cardSlots.map(getRects);
         const boundingRectOfMoved = dealersHand.getBoundingClientRect();
@@ -135,13 +137,12 @@ function moveCard({
             : srcSlot;
         const moveDuration = Date.now() - start;
         const animateCard = targetSlot === srcSlot && moveDuration > animationDuration;
-        const returnCard = c => (false && animateCard
+        const returnCard = c => (animateCard
             ? translateCard(dealersHand, srcSlot, c, table)
             : targetSlot.append(c));
 
         movedCards.forEach(returnCard);
-        table.removeEventListener('pointermove', moveCb);
-        // table.releasePointerCapture(e.pointerId);
+        table.removeEventListener(moveEvents[0], moveCb);
         moving = false;
     }, { once: true });
 }
