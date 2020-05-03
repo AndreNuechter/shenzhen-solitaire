@@ -101,7 +101,7 @@ function translateCard(srcSlot, targetSlot, card, table) {
     }px)`;
 
     // NOTE: disabling pointer-events to prevent a card being taken from underneath returning stack
-    [srcSlot, targetSlot].forEach((e) => { e.style.pointerEvents = 'none'; });
+    [srcSlot, targetSlot, card].forEach((e) => { e.style.pointerEvents = 'none'; });
 
     table.append(card);
     card.animate({
@@ -109,6 +109,6 @@ function translateCard(srcSlot, targetSlot, card, table) {
         easing: ['ease-in', 'ease-out']
     }, animationDuration).onfinish = () => {
         targetSlot.append(card);
-        [srcSlot, targetSlot].forEach((e) => { e.style = ''; });
+        [srcSlot, targetSlot, card].forEach(e => e.removeAttribute('style'));
     };
 }
