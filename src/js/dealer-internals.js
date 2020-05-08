@@ -57,7 +57,8 @@ function getTranslateString(x, y) { return `translate(${x},${y})`; }
 // for all but the last card, is its value one less than the next and a different color?
 function isOutOfOrder({ dataset: { color, value } }, position, cardStack) {
     return position < (cardStack.length - 1)
-        && (+cardStack[position + 1].dataset.value !== value - 1 || cardStack[position + 1].dataset.color === color);
+        && (+cardStack[position + 1].dataset.value !== value - 1
+            || cardStack[position + 1].dataset.color === color);
 }
 
 function measureOverlap({
@@ -99,16 +100,18 @@ function translateCard(srcSlot, targetSlot, card, table) {
     }translateY(${
         (targetSlot.children.length - 1) * cardGap * 2 * Number(targetSlot.dataset.slotType === 'stacking')
     }px)`;
+    // NOTE: disabling pointer-events to e.g. prevent cards being taken from below a returning stack
+    const elements2BeFrozen = [srcSlot, targetSlot, card, dragonSummoningBtns];
 
-    // NOTE: disabling pointer-events to prevent a card being taken from underneath returning stack
-    [srcSlot, targetSlot, card].forEach((e) => { e.style.pointerEvents = 'none'; });
-
+    elements2BeFrozen.forEach((e) => { e.style.pointerEvents = 'none'; });
     table.append(card);
-    card.animate({
+    const endAnimation = () => {
+        targetSlot.append(card);
+        elements2BeFrozen.forEach(e => e.removeAttribute('style'));
+    };
+    const animation = card.animate({
         transform: [cardTransforms + initialTransform, finalTransform],
         easing: ['ease-in', 'ease-out']
-    }, animationDuration).onfinish = () => {
-        targetSlot.append(card);
-        [srcSlot, targetSlot, card].forEach(e => e.removeAttribute('style'));
-    };
+    }, animationDuration);
+    animation.addEventListener('finish', endAnimation, { once: true });
 }

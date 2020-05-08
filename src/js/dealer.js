@@ -139,7 +139,7 @@ function moveCard({
         })();
         const targetSlot = mostOverlappingSlot || originalSlot;
         const moveDuration = Date.now() - start;
-        const animateCard = targetSlot === originalSlot && moveDuration > animationDuration;
+        const animateCard = targetSlot === originalSlot && moveDuration > (animationDuration * 2);
         const dropCard = c => (animateCard
             ? translateCard(dealersHand, originalSlot, c, table)
             : targetSlot.append(c));
