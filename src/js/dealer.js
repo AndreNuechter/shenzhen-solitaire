@@ -27,6 +27,7 @@ import {
     moveEvents
 } from './constants.js';
 
+const getRects = slot => [slot, slot.getBoundingClientRect()];
 const move = (x1, y1, srcSlotPos, scalingFactor) => (moveEvents[0].includes('touch')
     ? ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
         dealersHand
@@ -43,8 +44,6 @@ const move = (x1, y1, srcSlotPos, scalingFactor) => (moveEvents[0].includes('tou
             )}`);
     });
 let scalingFactor;
-// NOTE: to minimize issues w multiple pointers
-let moving = false;
 
 export {
     collectCard,
@@ -100,56 +99,58 @@ function moveCard({
     x: x1,
     y: y1
 }) {
-    if (moving) return;
+    // NOTE: to minimize issues w multiple pointers
+    if (dealersHand.children.length) return;
     const card = target.closest('.card');
     if (!card) return;
-    const srcSlot = card.parentNode;
-    if (!srcSlot.classList.contains('card-slot')) return;
-    const srcSlotPos = srcSlot.getAttribute('transform');
-    const movedCards = [...srcSlot.children]
-        .slice(indexOfNode(srcSlot.children, card));
+    const originalSlot = card.parentNode;
+    if (!originalSlot.classList.contains('card-slot')) return;
+    const posOfOriginalSlot = originalSlot.getAttribute('transform');
+    const movedCards = [...originalSlot.children]
+        .slice(indexOfNode(originalSlot.children, card));
     if (movedCards.some(isOutOfOrder)) return;
     // NOTE: checking time to not break dblclick
     const start = Date.now();
-    const moveCb = move(x1, y1, srcSlotPos, scalingFactor);
+    const moveCb = move(x1, y1, posOfOriginalSlot, scalingFactor);
 
-    moving = true;
-    dealersHand.setAttribute('transform', srcSlotPos);
+    dealersHand.setAttribute('transform', posOfOriginalSlot);
     dealersHand.append(...movedCards);
     table.addEventListener(moveEvents[0], moveCb, { passive: true });
     table.addEventListener(moveEvents[1], () => {
-        const getRects = slot => [slot, slot.getBoundingClientRect()];
         const boundinRectsOfSlots = cardSlots.map(getRects);
         const boundingRectOfMoved = dealersHand.getBoundingClientRect();
         const predicate = ([slot, rect]) => areOverlapping(boundingRectOfMoved, rect)
             && canBeMovedHere(dealersHand, slot);
         const availableOverlappingSlots = boundinRectsOfSlots.filter(predicate);
-        const index = (() => {
-            const overlaps = availableOverlappingSlots
-                .map(([, boundingRectOfOverlapping]) => measureOverlap(
+        const mostOverlappingSlot = (() => {
+            const mostOverlapping = { overlap: 0, slot: null };
+
+            availableOverlappingSlots.forEach(([slot, boundingRectOfOverlapping]) => {
+                const overlap = measureOverlap(
                     boundingRectOfMoved, boundingRectOfOverlapping
-                ));
-            const maxOverlap = Math.max(...overlaps);
-            return overlaps.findIndex(v => v === maxOverlap);
+                );
+
+                if (overlap > mostOverlapping.overlap) {
+                    Object.assign(mostOverlapping, { overlap, slot });
+                }
+            });
+
+            return mostOverlapping.slot;
         })();
-        const targetSlot = availableOverlappingSlots.length
-            ? availableOverlappingSlots[index][0]
-            : srcSlot;
+        const targetSlot = mostOverlappingSlot || originalSlot;
         const moveDuration = Date.now() - start;
-        const animateCard = targetSlot === srcSlot && moveDuration > animationDuration;
-        const returnCard = c => (animateCard
-            ? translateCard(dealersHand, srcSlot, c, table)
+        const animateCard = targetSlot === originalSlot && moveDuration > animationDuration;
+        const dropCard = c => (animateCard
+            ? translateCard(dealersHand, originalSlot, c, table)
             : targetSlot.append(c));
 
-        movedCards.forEach(returnCard);
+        movedCards.forEach(dropCard);
         table.removeEventListener(moveEvents[0], moveCb);
-        moving = false;
     }, { once: true });
 }
 
 function resetTable() {
     winNotification.style.display = '';
-    moving = false; // FIXME: only a band-aid. What is happening to prevent [move]up?
     cardSlots.forEach(c => c.classList.remove('consumed'));
     cards.forEach(c => c.classList.remove('frozen'));
     dealCards(cards);
