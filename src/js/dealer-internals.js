@@ -1,4 +1,5 @@
 import { animationDuration, cardGap } from './constants.js';
+import { dragonSummoningBtns } from './dom-selections.js';
 
 const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
 const getTransforms = e => e.getAttribute('transform').replace(...replacerArgs); // FIXME transform may be null
@@ -15,18 +16,18 @@ const stackRules = { // rules for stacking cards on a slot (keys are slot-types)
         // an non-empty slot, only takes cards of the same color, valued one higher than the top card
         return movedCards.length === 1
             && ((collected.length === 1 && dataOfFirstMoved.value === '0')
-                || (+dataOfFirstMoved.value === (+dataOfLastCollected.value + 1)
+                || (+dataOfFirstMoved.value === +dataOfLastCollected.value + 1
                     && dataOfFirstMoved.color === dataOfLastCollected.color));
     },
-    stacking: ({ children: [{ dataset: dataOfBottomMoved }] }, { children: stacked }) => {
-        const dataOfTopStacked = stacked[stacked.length - 1].dataset;
+    stacking: ({ children: [{ dataset: dataOfFirstMoved }] }, { children: stacked }) => {
+        const dataOfLastStacked = stacked[stacked.length - 1].dataset;
 
-        // if stacked has length 1, it's empty, so any movable stack can go here
+        // if stackingslot.children has length 1, it's empty, so any movable stack can go here
         // else we enforce descending values and alternating colors
         return stacked.length === 1
-            || (dataOfTopStacked.value
-                && +dataOfBottomMoved.value === +dataOfTopStacked.value - 1
-                && dataOfBottomMoved.color !== dataOfTopStacked.color);
+            || (dataOfLastStacked.value
+                && +dataOfFirstMoved.value === +dataOfLastStacked.value - 1
+                && dataOfFirstMoved.color !== dataOfLastStacked.color);
     }
 };
 
