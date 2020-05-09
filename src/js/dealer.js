@@ -4,11 +4,11 @@ import cards from './cards.js';
 import {
     areOverlapping,
     canBeMovedHere,
+    findMostOverlappingSlot,
     getTranslateString,
     isOutOfOrder,
     shuffleCards,
-    translateCard,
-    measureOverlap
+    translateCard
 } from './dealer-internals.js';
 import {
     cardSlots,
@@ -28,8 +28,12 @@ import {
 } from './constants.js';
 
 const getRects = slot => [slot, slot.getBoundingClientRect()];
-const move = (x1, y1, srcSlotPos, scalingFactor) => (moveEvents[0].includes('touch')
+const move = (x1, y1, srcSlotPos, scalingFactor, movedCards) => (moveEvents[0].includes('touch')
     ? ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
+        if (!dealersHand.children.length) {
+            dealersHand.append(...movedCards);
+        }
+
         dealersHand
             .setAttribute('transform', `${srcSlotPos}${getTranslateString(
                 (x2 - x1) * scalingFactor,
@@ -37,6 +41,10 @@ const move = (x1, y1, srcSlotPos, scalingFactor) => (moveEvents[0].includes('tou
             )}`);
     }
     : ({ x: x2, y: y2 }) => {
+        if (!dealersHand.children.length) {
+            dealersHand.append(...movedCards);
+        }
+
         dealersHand
             .setAttribute('transform', `${srcSlotPos}${getTranslateString(
                 (x2 - x1) * scalingFactor,
@@ -111,32 +119,21 @@ function moveCard({
     if (movedCards.some(isOutOfOrder)) return;
     // NOTE: checking time to not break dblclick
     const start = Date.now();
-    const moveCb = move(x1, y1, posOfOriginalSlot, scalingFactor);
+    const moveCb = move(x1, y1, posOfOriginalSlot, scalingFactor, movedCards);
 
     dealersHand.setAttribute('transform', posOfOriginalSlot);
-    dealersHand.append(...movedCards);
     table.addEventListener(moveEvents[0], moveCb, { passive: true });
     table.addEventListener(moveEvents[1], () => {
+        table.removeEventListener(moveEvents[0], moveCb);
+
+        if (!dealersHand.children.length) return;
+
         const boundinRectsOfSlots = cardSlots.map(getRects);
         const boundingRectOfMoved = dealersHand.getBoundingClientRect();
         const predicate = ([slot, rect]) => areOverlapping(boundingRectOfMoved, rect)
             && canBeMovedHere(dealersHand, slot);
         const availableOverlappingSlots = boundinRectsOfSlots.filter(predicate);
-        const mostOverlappingSlot = (() => {
-            const mostOverlapping = { overlap: 0, slot: null };
-
-            availableOverlappingSlots.forEach(([slot, boundingRectOfOverlapping]) => {
-                const overlap = measureOverlap(
-                    boundingRectOfMoved, boundingRectOfOverlapping
-                );
-
-                if (overlap > mostOverlapping.overlap) {
-                    Object.assign(mostOverlapping, { overlap, slot });
-                }
-            });
-
-            return mostOverlapping.slot;
-        })();
+        const mostOverlappingSlot = findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved);
         const targetSlot = mostOverlappingSlot || originalSlot;
         const moveDuration = Date.now() - start;
         const animateCard = targetSlot === originalSlot && moveDuration > (animationDuration * 2);
@@ -144,8 +141,7 @@ function moveCard({
             ? translateCard(dealersHand, originalSlot, c, table)
             : targetSlot.append(c));
 
-        movedCards.forEach(dropCard);
-        table.removeEventListener(moveEvents[0], moveCb);
+        [...dealersHand.children].forEach(dropCard);
     }, { once: true });
 }
 

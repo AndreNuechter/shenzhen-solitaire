@@ -30,13 +30,33 @@ const stackRules = { // rules for stacking cards on a slot (keys are slot-types)
                 && dataOfFirstMoved.color !== dataOfLastStacked.color);
     }
 };
+const measureOverlap = ({
+    x: x1,
+    y: y1,
+    width: width1,
+    height: height1
+}, {
+    x: x2,
+    y: y2,
+    width: width2,
+    height: height2
+}) => {
+    const [start, end] = (() => {
+        if (x1 > x2 && y1 > y2) return [{ x: x1, y: y1 }, { x: x2 + width2, y: y2 + height2 }];
+        if (x1 < x2 && y1 > y2) return [{ x: x2, y: y1 }, { x: x1 + width1, y: y2 + height2 }];
+        if (x1 > x2 && y1 < y2) return [{ x: x1, y: y2 }, { x: x2 + width2, y: y1 + height1 }];
+        return [{ x: x2, y: y2 }, { x: x1 + width1, y: y1 + height1 }];
+    })();
+
+    return (end.x - start.x) * (end.y - start.y);
+};
 
 export {
     areOverlapping,
     canBeMovedHere,
+    findMostOverlappingSlot,
     getTranslateString,
     isOutOfOrder,
-    measureOverlap,
     shuffleCards,
     translateCard
 };
@@ -53,6 +73,22 @@ function canBeMovedHere(movedSubStack, slot) {
     return stackRules[slot.dataset.slotType](movedSubStack, slot);
 }
 
+function findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved) {
+    const mostOverlapping = { overlap: 0, slot: null };
+
+    availableOverlappingSlots.forEach(([slot, boundingRectOfOverlapping]) => {
+        const overlap = measureOverlap(
+            boundingRectOfMoved, boundingRectOfOverlapping
+        );
+
+        if (overlap > mostOverlapping.overlap) {
+            Object.assign(mostOverlapping, { overlap, slot });
+        }
+    });
+
+    return mostOverlapping.slot;
+}
+
 function getTranslateString(x, y) { return `translate(${x},${y})`; }
 
 // for all but the last card, is its value one less than the next and a different color?
@@ -60,27 +96,6 @@ function isOutOfOrder({ dataset: { color, value } }, position, cardStack) {
     return position < (cardStack.length - 1)
         && (+cardStack[position + 1].dataset.value !== value - 1
             || cardStack[position + 1].dataset.color === color);
-}
-
-function measureOverlap({
-    x: x1,
-    y: y1,
-    width: width1,
-    height: height1
-}, {
-    x: x2,
-    y: y2,
-    width: width2,
-    height: height2
-}) {
-    const [start, end] = (() => {
-        if (x1 > x2 && y1 > y2) return [{ x: x1, y: y1 }, { x: x2 + width2, y: y2 + height2 }];
-        if (x1 < x2 && y1 > y2) return [{ x: x2, y: y1 }, { x: x1 + width1, y: y2 + height2 }];
-        if (x1 > x2 && y1 < y2) return [{ x: x1, y: y2 }, { x: x2 + width2, y: y1 + height1 }];
-        return [{ x: x2, y: y2 }, { x: x1 + width1, y: y1 + height1 }];
-    })();
-
-    return (end.x - start.x) * (end.y - start.y);
 }
 
 function shuffleCards(deck) {
