@@ -48,9 +48,6 @@ const observers = {
         }
     },
     stacking: slot => (mutations) => {
-        // NOTE: to keep a returning substack from collapsing, eg when clicked multiple times
-        if (mutations.length === 2 && mutations[0].removedNodes[0] === mutations[1].addedNodes[0]) return;
-
         mutations.forEach(({ addedNodes: addedCards }) => {
             addedCards.forEach((card) => {
                 stackCard(

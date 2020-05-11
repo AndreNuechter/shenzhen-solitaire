@@ -23,34 +23,21 @@ import {
 import { indexOfNode } from './helper-functions.js';
 import {
     animationDuration,
-    width,
-    moveEvents
+    width
 } from './constants.js';
 
 const getRects = slot => [slot, slot.getBoundingClientRect()];
-const move = (x1, y1, srcSlotPos, scalingFactor, movedCards) => (moveEvents[0].includes('touch')
-    ? ({ changedTouches: [{ pageX: x2, pageY: y2 }] }) => {
-        if (!dealersHand.children.length) {
-            dealersHand.append(...movedCards);
-        }
-
-        dealersHand
-            .setAttribute('transform', `${srcSlotPos}${getTranslateString(
-                (x2 - x1) * scalingFactor,
-                (y2 - y1) * scalingFactor
-            )}`);
+const move = (x1, y1, srcSlotPos, scalingFactor, movedCards) => ({ x: x2, y: y2 }) => {
+    if (!dealersHand.children.length) {
+        dealersHand.append(...movedCards);
     }
-    : ({ x: x2, y: y2 }) => {
-        if (!dealersHand.children.length) {
-            dealersHand.append(...movedCards);
-        }
 
-        dealersHand
-            .setAttribute('transform', `${srcSlotPos}${getTranslateString(
-                (x2 - x1) * scalingFactor,
-                (y2 - y1) * scalingFactor
-            )}`);
-    });
+    dealersHand
+        .setAttribute('transform', `${srcSlotPos}${getTranslateString(
+            (x2 - x1) * scalingFactor,
+            (y2 - y1) * scalingFactor
+        )}`);
+};
 let scalingFactor;
 
 export {
@@ -64,6 +51,8 @@ export {
 };
 
 function collectCard({ x, y }) {
+    if (dealersHand.children.length) return;
+
     const card = document.elementFromPoint(x, y).closest('.card');
 
     if (!card) return;
@@ -122,9 +111,9 @@ function moveCard({
     const moveCb = move(x1, y1, posOfOriginalSlot, scalingFactor, movedCards);
 
     dealersHand.setAttribute('transform', posOfOriginalSlot);
-    table.addEventListener(moveEvents[0], moveCb, { passive: true });
-    table.addEventListener(moveEvents[1], () => {
-        table.removeEventListener(moveEvents[0], moveCb);
+    table.addEventListener('pointermove', moveCb, { passive: true });
+    table.addEventListener('pointerup', () => {
+        table.removeEventListener('pointermove', moveCb);
 
         if (!dealersHand.children.length) return;
 
