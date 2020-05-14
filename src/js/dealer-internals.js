@@ -110,7 +110,6 @@ function shuffleCards(deck) {
 function translateCard(srcSlot, targetSlot, card, table) {
     const cardTransforms = getTransforms(card);
     const initialTransform = getTransforms(srcSlot);
-    // NOTE: cards returing to stackslot should translate down (to the top of the stack)
     const finalTransform = `${
         getTransforms(targetSlot)
     }translateY(${
@@ -119,15 +118,15 @@ function translateCard(srcSlot, targetSlot, card, table) {
     // NOTE: disabling pointer-events to e.g. prevent cards being taken from below a returning stack
     const elements2BeFrozen = [srcSlot, targetSlot, card, dragonSummoningBtns];
 
-    elements2BeFrozen.forEach((e) => { e.style.pointerEvents = 'none'; });
+    elements2BeFrozen.forEach((el) => { el.style.pointerEvents = 'none'; });
     table.append(card);
-    const endAnimation = () => {
-        targetSlot.append(card);
-        elements2BeFrozen.forEach(e => e.removeAttribute('style'));
-    };
-    const animation = card.animate({
-        transform: [cardTransforms + initialTransform, finalTransform],
-        easing: ['ease-in', 'ease-out']
-    }, animationDuration);
-    animation.addEventListener('finish', endAnimation, { once: true });
+    card
+        .animate({
+            transform: [cardTransforms + initialTransform, finalTransform],
+            easing: ['ease-in', 'ease-out']
+        }, animationDuration)
+        .addEventListener('finish', () => {
+            targetSlot.append(card);
+            elements2BeFrozen.forEach(el => el.removeAttribute('style'));
+        }, { once: true });
 }

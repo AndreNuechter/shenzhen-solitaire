@@ -28,6 +28,6 @@ winNotification.onclick = () => resetBtn.click();
 window.addEventListener('DOMContentLoaded', () => {
     dealCards(cards);
     setScalingFactor();
-});
+}, { once: true });
 window.onresize = setScalingFactor;
 window.ondblclick = collectCard;
