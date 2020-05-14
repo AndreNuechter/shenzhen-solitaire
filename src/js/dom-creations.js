@@ -2,8 +2,8 @@
 
 import { configElement } from './helper-functions.js';
 import {
-    ns,
-    cardDefaults
+    cardDefaults,
+    ns
 } from './constants.js';
 
 const group = document.createElementNS(ns, 'g');

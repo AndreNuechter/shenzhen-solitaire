@@ -17,6 +17,10 @@ const checkForWin = () => {
         winNotification.style.display = 'block';
     }
 };
+const consumeSlotAndCheckForWin = (slot) => {
+    slot.classList.add('consumed');
+    checkForWin();
+};
 const stackCard = (node, offset) => node.setAttribute('transform', `translate(0,${offset * cardGap * 2})`);
 const basicAdditionHandler = ({ addedNodes: [card] }) => {
     card.removeAttribute('transform');
@@ -26,8 +30,7 @@ const observers = {
     collection: slot => (mutations) => {
         if (mutations[0].addedNodes.length) mutations.forEach(basicAdditionHandler);
         if (slot.children.length === 10) {
-            slot.classList.add('consumed');
-            checkForWin();
+            consumeSlotAndCheckForWin(slot);
         }
     },
     dragon: slot => (mutations) => {
@@ -36,15 +39,13 @@ const observers = {
         };
         if (mutations[0].addedNodes.length) mutations.forEach(additionHandler);
         if (slot.children.length > 2) {
-            slot.classList.add('consumed');
-            checkForWin();
+            consumeSlotAndCheckForWin(slot);
         }
     },
     flower: slot => (mutations) => {
         if (mutations[0].addedNodes.length) {
             mutations.forEach(basicAdditionHandler);
-            slot.classList.add('consumed');
-            checkForWin();
+            consumeSlotAndCheckForWin(slot);
         }
     },
     stacking: slot => (mutations) => {

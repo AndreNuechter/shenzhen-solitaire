@@ -21,10 +21,7 @@ import {
     winNotification
 } from './dom-selections.js';
 import { indexOfNode } from './helper-functions.js';
-import {
-    animationDuration,
-    width
-} from './constants.js';
+import { width } from './constants.js';
 
 const getRects = slot => [slot, slot.getBoundingClientRect()];
 const move = (x1, y1, srcSlotPos, scalingFactor, movedCards) => ({ x: x2, y: y2 }) => {
@@ -96,18 +93,22 @@ function moveCard({
     x: x1,
     y: y1
 }) {
-    // NOTE: to minimize issues w multiple pointers
     if (dealersHand.children.length) return;
+
     const card = target.closest('.card');
+
     if (!card) return;
+
     const originalSlot = card.parentNode;
+
     if (!originalSlot.classList.contains('card-slot')) return;
-    const posOfOriginalSlot = originalSlot.getAttribute('transform');
+
     const movedCards = [...originalSlot.children]
         .slice(indexOfNode(originalSlot.children, card));
+
     if (movedCards.some(isOutOfOrder)) return;
-    // NOTE: checking time to not break dblclick
-    const start = Date.now();
+
+    const posOfOriginalSlot = originalSlot.getAttribute('transform');
     const moveCb = move(x1, y1, posOfOriginalSlot, scalingFactor, movedCards);
 
     dealersHand.setAttribute('transform', posOfOriginalSlot);
@@ -124,11 +125,7 @@ function moveCard({
         const availableOverlappingSlots = boundinRectsOfSlots.filter(predicate);
         const mostOverlappingSlot = findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved);
         const targetSlot = mostOverlappingSlot || originalSlot;
-        const moveDuration = Date.now() - start;
-        const animateCard = targetSlot === originalSlot && moveDuration > (animationDuration * 2);
-        const dropCard = c => (animateCard
-            ? translateCard(dealersHand, originalSlot, c, table)
-            : targetSlot.append(c));
+        const dropCard = c => translateCard(dealersHand, targetSlot, c, table);
 
         [...dealersHand.children].forEach(dropCard);
     }, { once: true });

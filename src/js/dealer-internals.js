@@ -2,7 +2,7 @@ import { animationDuration, cardGap } from './constants.js';
 import { dragonSummoningBtns } from './dom-selections.js';
 
 const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
-const getTransforms = e => e.getAttribute('transform').replace(...replacerArgs); // FIXME transform may be null
+const getTransforms = el => el.getAttribute('transform').replace(...replacerArgs);
 const stackRules = { // rules for stacking cards on a slot (keys are slot-types)
     dragon: (movedSubStack, slot) => movedSubStack.children.length === 1
         && slot.children.length === 1,

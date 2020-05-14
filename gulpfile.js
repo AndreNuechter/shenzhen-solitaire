@@ -22,11 +22,13 @@ const proverbs = [
     'Luck never gives; it only lends.',
     'Before you gamble: Know the rules, the stakes and predetermine the quitting time.'
 ];
-
 const htmlRoot = 'src/pug/index.pug';
 const style = 'src/scss/index.scss';
 const devDir = 'dev';
 const deployDir = 'docs';
+
+exports.default = parallel(html, css, serve, watchCSSAndHTML);
+exports.bundle = parallel(htmlProd, cssProd, js, pwaAssets);
 
 function html() {
     return src(htmlRoot)
@@ -88,6 +90,3 @@ function serve() {
     // eslint-disable-next-line no-console
     app.listen(3000, () => console.log(proverbs[randomInt(proverbs.length, 0)]));
 }
-
-exports.default = parallel(html, css, serve, watchCSSAndHTML);
-exports.bundle = parallel(htmlProd, cssProd, js, pwaAssets);
