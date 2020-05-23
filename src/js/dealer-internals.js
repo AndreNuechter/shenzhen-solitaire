@@ -1,74 +1,19 @@
 import { animationDuration, cardGap } from './constants.js';
 import { dragonSummoningBtns } from './dom-selections.js';
+import stackRules from './card-stacking-rules.js';
 
 const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
 const getTransforms = el => el.getAttribute('transform').replace(...replacerArgs);
-const stackRules = {
-    dragon: (movedSubStack, slot) => movedSubStack.children.length === 1 && slot.children.length === 1,
-    flower: ({ children: [{ dataset: { color, value } }] }) => !value && !color,
-    collection: ({ children: movedCards }, { children: collected }) => {
-        const {
-            color: movedColor,
-            value: movedValue
-        } = movedCards[0].dataset;
-        const {
-            color: collectedColor,
-            value: collectedValue
-        } = collected[collected.length - 1].dataset;
-
-        // only single cards may be added to a collection slot
-        if (movedCards.length !== 1) return false;
-        // an empty collection slot, does only take a 1-valued card
-        // NOTE: a slot is "empty" w one child, as the first is the frame
-        if (collected.length === 1 && movedValue === '1') return true;
-        // a non-empty slot only takes cards of the same color, valued one higher than the top card
-        return +movedValue === +collectedValue + 1 && movedColor === collectedColor;
-    },
-    stacking: ({ children: [{ dataset: dataOfFirstMoved }] }, { children: stacked }) => {
-        const {
-            color: topStackedColor,
-            value: topStackedValue
-        } = stacked[stacked.length - 1].dataset;
-        const {
-            color: bottomMovedColor,
-            value: bottomMovedValue
-        } = dataOfFirstMoved;
-
-        // an empty stacking-slot accepts any movable stack
-        if (stacked.length === 1) return true;
-        // value-less cards cannot be stacked
-        if (!(topStackedValue && bottomMovedValue)) return false;
-        // else we enforce descending values and alternating colors
-        return +bottomMovedValue === topStackedValue - 1 && bottomMovedColor !== topStackedColor;
-    }
-};
-const measureOverlap = ({
-    x: x1,
-    y: y1,
-    width: width1,
-    height: height1
-}, {
-    x: x2,
-    y: y2,
-    width: width2,
-    height: height2
-}) => {
-    const [start, end] = (() => {
-        if (x1 > x2 && y1 > y2) return [{ x: x1, y: y1 }, { x: x2 + width2, y: y2 + height2 }];
-        if (x1 < x2 && y1 > y2) return [{ x: x2, y: y1 }, { x: x1 + width1, y: y2 + height2 }];
-        if (x1 > x2 && y1 < y2) return [{ x: x1, y: y2 }, { x: x2 + width2, y: y1 + height1 }];
-        return [{ x: x2, y: y2 }, { x: x1 + width1, y: y1 + height1 }];
-    })();
-
-    return (end.x - start.x) * (end.y - start.y);
-};
+const getRects = slot => [slot, slot.getBoundingClientRect()];
 
 export {
     areOverlapping,
     canBeMovedHere,
+    dropCardCbFactory,
     findMostOverlappingSlot,
     getTranslateString,
     isOutOfOrder,
+    moveCardCbFactory,
     shuffleCards,
     translateCard
 };
@@ -85,6 +30,25 @@ function areOverlapping(rect1, rect2) {
 
 function canBeMovedHere(movedSubStack, slot) {
     return stackRules[slot.dataset.slotType](movedSubStack, slot);
+}
+
+function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots) {
+    return () => {
+        table.removeEventListener('pointermove', moveCb);
+
+        if (!dealersHand.children.length) return;
+
+        const boundinRectsOfSlots = cardSlots.map(getRects);
+        const boundingRectOfMoved = dealersHand.getBoundingClientRect();
+        const predicate = ([slot, rect]) => areOverlapping(boundingRectOfMoved, rect)
+            && canBeMovedHere(dealersHand, slot);
+        const availableOverlappingSlots = boundinRectsOfSlots.filter(predicate);
+        const mostOverlappingSlot = findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved);
+        const targetSlot = mostOverlappingSlot || originalSlot;
+        const dropCardCb = c => translateCard(dealersHand, targetSlot, c, table);
+
+        [...dealersHand.children].forEach(dropCardCb);
+    };
 }
 
 function findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved) {
@@ -116,6 +80,44 @@ function isOutOfOrder({ dataset: { color: thisColor, value: thisValue } }, posit
     } = cardStack[position + 1].dataset;
     return !nextValue || +nextValue !== thisValue - 1 || nextColor === thisColor;
 }
+
+function measureOverlap({
+    x: x1,
+    y: y1,
+    width: width1,
+    height: height1
+}, {
+    x: x2,
+    y: y2,
+    width: width2,
+    height: height2
+}) {
+    const [start, end] = (() => {
+        if (x1 > x2 && y1 > y2) return [{ x: x1, y: y1 }, { x: x2 + width2, y: y2 + height2 }];
+        if (x1 < x2 && y1 > y2) return [{ x: x2, y: y1 }, { x: x1 + width1, y: y2 + height2 }];
+        if (x1 > x2 && y1 < y2) return [{ x: x1, y: y2 }, { x: x2 + width2, y: y1 + height1 }];
+        return [{ x: x2, y: y2 }, { x: x1 + width1, y: y1 + height1 }];
+    })();
+
+    return (end.x - start.x) * (end.y - start.y);
+}
+
+function moveCardCbFactory(x1, y1, srcSlotPos, scalingFactor, movedCards, dealersHand) {
+    return ({ x: x2, y: y2, isPrimary }) => {
+        if (!isPrimary) return;
+
+        if (!dealersHand.children.length) {
+            dealersHand.append(...movedCards);
+        }
+
+        dealersHand
+            .setAttribute('transform', `${srcSlotPos}${getTranslateString(
+                (x2 - x1) * scalingFactor,
+                (y2 - y1) * scalingFactor
+            )}`);
+    };
+}
+
 
 function shuffleCards(deck) {
     // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array

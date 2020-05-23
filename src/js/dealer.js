@@ -2,11 +2,9 @@
 
 import cards from './cards.js';
 import {
-    areOverlapping,
-    canBeMovedHere,
-    findMostOverlappingSlot,
-    getTranslateString,
+    dropCardCbFactory,
     isOutOfOrder,
+    moveCardCbFactory,
     shuffleCards,
     translateCard
 } from './dealer-internals.js';
@@ -23,36 +21,6 @@ import {
 import { indexOfNode } from './helper-functions.js';
 import { width } from './constants.js';
 
-const getRects = slot => [slot, slot.getBoundingClientRect()];
-const moveCardFactory = (x1, y1, srcSlotPos, scalingFactor, movedCards) => ({ x: x2, y: y2, isPrimary }) => {
-    if (!isPrimary) return;
-
-    if (!dealersHand.children.length) {
-        dealersHand.append(...movedCards);
-    }
-
-    dealersHand
-        .setAttribute('transform', `${srcSlotPos}${getTranslateString(
-            (x2 - x1) * scalingFactor,
-            (y2 - y1) * scalingFactor
-        )}`);
-};
-const dropCardFactory = (moveCb, originalSlot) => () => {
-    table.removeEventListener('pointermove', moveCb);
-
-    if (!dealersHand.children.length) return;
-
-    const boundinRectsOfSlots = cardSlots.map(getRects);
-    const boundingRectOfMoved = dealersHand.getBoundingClientRect();
-    const predicate = ([slot, rect]) => areOverlapping(boundingRectOfMoved, rect)
-        && canBeMovedHere(dealersHand, slot);
-    const availableOverlappingSlots = boundinRectsOfSlots.filter(predicate);
-    const mostOverlappingSlot = findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved);
-    const targetSlot = mostOverlappingSlot || originalSlot;
-    const dropCardCb = c => translateCard(dealersHand, targetSlot, c, table);
-
-    [...dealersHand.children].forEach(dropCardCb);
-};
 let scalingFactor;
 
 export {
@@ -66,8 +34,6 @@ export {
 };
 
 function collectCard({ x, y }) {
-    if (dealersHand.children.length) return;
-
     const card = document.elementFromPoint(x, y).closest('.card');
 
     if (!card) return;
@@ -84,18 +50,18 @@ function collectCard({ x, y }) {
     const targetSlot = (() => {
         if (!value) return flowerSlot;
 
-        const predicate = value === '1'
-            ? s => s.children.length === 1
+        const isDblclickableCard = value === '1'
+            ? slot => slot.children.length === 1
             : ({
                 lastChild: {
                     dataset: {
-                        color: c,
-                        value: v
+                        color: slottedCardColor,
+                        value: slottedCardValue
                     }
                 }
-            }) => c === color && +v === (value - 1);
+            }) => slottedCardColor === color && +slottedCardValue === (value - 1);
 
-        return collectionSlots.find(predicate);
+        return collectionSlots.find(isDblclickableCard);
     })();
 
     if (targetSlot) translateCard(srcSlot, targetSlot, card, table);
@@ -123,11 +89,14 @@ function moveCard({ target, x: x1, y: y1 }) {
     if (movedCards.some(isOutOfOrder)) return;
 
     const posOfOriginalSlot = originalSlot.getAttribute('transform');
-    const moveCb = moveCardFactory(x1, y1, posOfOriginalSlot, scalingFactor, movedCards);
+    const moveCb = moveCardCbFactory(x1, y1, posOfOriginalSlot, scalingFactor, movedCards, dealersHand);
 
     dealersHand.setAttribute('transform', posOfOriginalSlot);
     table.addEventListener('pointermove', moveCb, { passive: true });
-    table.addEventListener('pointerup', dropCardFactory(moveCb, originalSlot), { once: true });
+    table.addEventListener(
+        'pointerup',
+        dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots), { once: true }
+    );
 }
 
 function resetTable() {

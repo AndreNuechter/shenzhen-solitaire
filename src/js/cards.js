@@ -56,13 +56,12 @@ const cardTemplate = (color, value) => {
     });
     const cardBoard = rect.cloneNode(false);
     const cardFace = (() => {
-        if (color && !value) {
-            return cardFaceTmpl(symbols.dragon, color);
-        }
-        if (color) {
+        if (value) {
             return cardFaceTmpl(symbols[color], color, value);
         }
-
+        if (color) {
+            return cardFaceTmpl(symbols.dragon, color);
+        }
         return cardFaceTmpl(symbols.flower, 'hotpink');
     })();
 
