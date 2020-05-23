@@ -3,31 +3,43 @@ import { dragonSummoningBtns } from './dom-selections.js';
 
 const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
 const getTransforms = el => el.getAttribute('transform').replace(...replacerArgs);
-const stackRules = { // rules for stacking cards on a slot (keys are slot-types)
-    dragon: (movedSubStack, slot) => movedSubStack.children.length === 1
-        && slot.children.length === 1,
+const stackRules = {
+    dragon: (movedSubStack, slot) => movedSubStack.children.length === 1 && slot.children.length === 1,
     flower: ({ children: [{ dataset: { color, value } }] }) => !value && !color,
     collection: ({ children: movedCards }, { children: collected }) => {
-        const dataOfFirstMoved = movedCards[0].dataset;
-        const dataOfLastCollected = collected[collected.length - 1].dataset;
+        const {
+            color: movedColor,
+            value: movedValue
+        } = movedCards[0].dataset;
+        const {
+            color: collectedColor,
+            value: collectedValue
+        } = collected[collected.length - 1].dataset;
 
         // only single cards may be added to a collection slot
-        // an empty collection slot, does only take a 0-valued card
-        // an non-empty slot, only takes cards of the same color, valued one higher than the top card
-        return movedCards.length === 1
-            && ((collected.length === 1 && dataOfFirstMoved.value === '0')
-                || (+dataOfFirstMoved.value === +dataOfLastCollected.value + 1
-                    && dataOfFirstMoved.color === dataOfLastCollected.color));
+        if (movedCards.length !== 1) return false;
+        // an empty collection slot, does only take a 1-valued card
+        // NOTE: a slot is "empty" w one child, as the first is the frame
+        if (collected.length === 1 && movedValue === '1') return true;
+        // a non-empty slot only takes cards of the same color, valued one higher than the top card
+        return +movedValue === +collectedValue + 1 && movedColor === collectedColor;
     },
     stacking: ({ children: [{ dataset: dataOfFirstMoved }] }, { children: stacked }) => {
-        const dataOfLastStacked = stacked[stacked.length - 1].dataset;
+        const {
+            color: topStackedColor,
+            value: topStackedValue
+        } = stacked[stacked.length - 1].dataset;
+        const {
+            color: bottomMovedColor,
+            value: bottomMovedValue
+        } = dataOfFirstMoved;
 
-        // if stackingslot.children has length 1, it's empty, so any movable stack can go here
+        // an empty stacking-slot accepts any movable stack
+        if (stacked.length === 1) return true;
+        // value-less cards cannot be stacked
+        if (!(topStackedValue && bottomMovedValue)) return false;
         // else we enforce descending values and alternating colors
-        return stacked.length === 1
-            || (dataOfLastStacked.value
-                && +dataOfFirstMoved.value === +dataOfLastStacked.value - 1
-                && dataOfFirstMoved.color !== dataOfLastStacked.color);
+        return +bottomMovedValue === topStackedValue - 1 && bottomMovedColor !== topStackedColor;
     }
 };
 const measureOverlap = ({
@@ -63,10 +75,12 @@ export {
 
 // https://stackoverflow.com/questions/12066870/how-to-check-if-an-element-is-overlapping-other-elements
 function areOverlapping(rect1, rect2) {
-    return !(rect1.right < rect2.left
+    return !(
+        rect1.right < rect2.left
         || rect1.left > rect2.right
         || rect1.bottom < rect2.top
-        || rect1.top > rect2.bottom);
+        || rect1.top > rect2.bottom
+    );
 }
 
 function canBeMovedHere(movedSubStack, slot) {
@@ -78,7 +92,8 @@ function findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved)
 
     availableOverlappingSlots.forEach(([slot, boundingRectOfOverlapping]) => {
         const overlap = measureOverlap(
-            boundingRectOfMoved, boundingRectOfOverlapping
+            boundingRectOfMoved,
+            boundingRectOfOverlapping
         );
 
         if (overlap > mostOverlapping.overlap) {
@@ -89,13 +104,17 @@ function findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved)
     return mostOverlapping.slot;
 }
 
-function getTranslateString(x, y) { return `translate(${x},${y})`; }
+function getTranslateString(x, y) {
+    return `translate(${x},${y})`;
+}
 
-// for all but the last card, is its value one less than the next and a different color?
-function isOutOfOrder({ dataset: { color, value } }, position, cardStack) {
-    return position < (cardStack.length - 1)
-        && (+cardStack[position + 1].dataset.value !== value - 1
-            || cardStack[position + 1].dataset.color === color);
+function isOutOfOrder({ dataset: { color: thisColor, value: thisValue } }, position, cardStack) {
+    if (position === cardStack.length - 1) return false;
+    const {
+        color: nextColor,
+        value: nextValue
+    } = cardStack[position + 1].dataset;
+    return !nextValue || +nextValue !== thisValue - 1 || nextColor === thisColor;
 }
 
 function shuffleCards(deck) {

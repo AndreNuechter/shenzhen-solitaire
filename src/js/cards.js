@@ -56,11 +56,11 @@ const cardTemplate = (color, value) => {
     });
     const cardBoard = rect.cloneNode(false);
     const cardFace = (() => {
-        if (color && value === '') {
+        if (color && !value) {
             return cardFaceTmpl(symbols.dragon, color);
         }
         if (color) {
-            return cardFaceTmpl(symbols[color], color, value + 1);
+            return cardFaceTmpl(symbols[color], color, value);
         }
 
         return cardFaceTmpl(symbols.flower, 'hotpink');
@@ -70,11 +70,11 @@ const cardTemplate = (color, value) => {
     Object.assign(card.dataset, { color, value });
     return card;
 };
-// NOTE: values 0-8 are for normal cards, dragons have no value and the flower has neither color nor value
+// NOTE: values 1-9 are for normal cards, dragons have no value and the flower has neither color nor value
 const cards = ['black', 'red', 'green']
     .flatMap(color => Array
         .from({ length: 13 },
-            (_, i) => cardTemplate(color, i <= 8 ? i : '')));
+            (_, i) => cardTemplate(color, i <= 8 ? i + 1 : '')));
 cards.push(cardTemplate('', ''));
 
 export default cards;
