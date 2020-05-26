@@ -1,5 +1,3 @@
-/* globals localStorage */
-
 const scoreCounter = JSON.parse(localStorage.getItem('score')) || { score: 0 };
 
 export default new Proxy(scoreCounter, {

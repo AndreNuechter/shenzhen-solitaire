@@ -1,5 +1,3 @@
-/* globals window */
-
 import {
     dragonSummoningBtns,
     resetBtn,

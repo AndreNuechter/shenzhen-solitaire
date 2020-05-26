@@ -1,5 +1,3 @@
-/* globals document */
-
 import { configElement } from './helper-functions.js';
 import {
     cardDefaults,

@@ -1,5 +1,3 @@
-/* globals MutationObserver */
-
 import { cardGap } from './constants.js';
 import {
     cardSlots,

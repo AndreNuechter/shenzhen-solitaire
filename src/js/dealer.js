@@ -1,5 +1,3 @@
-/* globals document */
-
 import cards from './cards.js';
 import {
     dropCardCbFactory,

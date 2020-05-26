@@ -14,5 +14,11 @@
         "eol-last": ["error", "never"],
         "no-param-reassign": ["error", { "props": false }],
         "import/extensions": false
+    },
+    "globals": {
+        "document": false,
+        "window": false,
+        "localStorage": false,
+        "MutationObserver": false
     }
 }

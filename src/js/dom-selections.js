@@ -1,5 +1,3 @@
-/* globals document */
-
 const cardSlots = [...document.getElementsByClassName('card-slot')];
 const collectionSlots = [...document.querySelectorAll('[data-slot-type="collection"]')];
 const consumedSlots = document.getElementsByClassName('consumed');
