@@ -1,8 +1,5 @@
+import { cardDefaults, ns } from './constants.js';
 import { configElement } from './helper-functions.js';
-import {
-    cardDefaults,
-    ns
-} from './constants.js';
 
 const group = document.createElementNS(ns, 'g');
 const rect = configElement(document.createElementNS(ns, 'rect'), cardDefaults);

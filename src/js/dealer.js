@@ -1,11 +1,3 @@
-import cards from './cards.js';
-import {
-    dropCardCbFactory,
-    isOutOfOrder,
-    moveCardCbFactory,
-    shuffleCards,
-    translateCard
-} from './dealer-internals.js';
 import {
     cardSlots,
     collectionSlots,
@@ -16,6 +8,14 @@ import {
     table,
     winNotification
 } from './dom-selections.js';
+import {
+    dropCardCbFactory,
+    isOutOfOrder,
+    moveCardCbFactory,
+    shuffleCards,
+    translateCard
+} from './dealer-internals.js';
+import cards from './cards.js';
 import { indexOfNode } from './helper-functions.js';
 import { width } from './constants.js';
 

@@ -1,10 +1,10 @@
-import { cardGap } from './constants.js';
 import {
     cardSlots,
     consumedSlots,
     scoreDisplay,
     winNotification
 } from './dom-selections.js';
+import { cardGap } from './constants.js';
 import { indexOfNode } from './helper-functions.js';
 import scoreCounter from './score-counter.js';
 

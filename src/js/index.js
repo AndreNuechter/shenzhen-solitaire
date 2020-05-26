@@ -1,19 +1,19 @@
 import {
+    collectCard,
+    dealCards,
+    moveCard,
+    resetTable,
+    setScalingFactor,
+    summonDragons,
+    visualizeButtonClick
+} from './dealer.js';
+import {
     dragonSummoningBtns,
     resetBtn,
     table,
     winNotification
 } from './dom-selections.js';
 import cards from './cards.js';
-import {
-    collectCard,
-    dealCards,
-    moveCard,
-    resetTable,
-    summonDragons,
-    setScalingFactor,
-    visualizeButtonClick
-} from './dealer.js';
 
 Object.assign(dragonSummoningBtns, {
     onclick: summonDragons,

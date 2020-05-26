@@ -1,10 +1,10 @@
-import { configClone } from './helper-functions.js';
 import {
     group,
     rect,
     text,
     use
 } from './dom-creations.js';
+import { configClone } from './helper-functions.js';
 
 const symbols = {
     red: '#famine',
