@@ -87,13 +87,14 @@ function moveCard({ target, x: x1, y: y1 }) {
     if (movedCards.some(isOutOfOrder)) return;
 
     const posOfOriginalSlot = originalSlot.getAttribute('transform');
+    const start = Date.now();
     const moveCb = moveCardCbFactory(x1, y1, posOfOriginalSlot, scalingFactor, movedCards, dealersHand);
 
     dealersHand.setAttribute('transform', posOfOriginalSlot);
     table.addEventListener('pointermove', moveCb, { passive: true });
     table.addEventListener(
         'pointerup',
-        dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots), { once: true }
+        dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, start), { once: true }
     );
 }
 

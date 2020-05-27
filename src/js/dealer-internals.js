@@ -32,7 +32,7 @@ function canBeMovedHere(movedSubStack, slot) {
     return stackRules[slot.dataset.slotType](movedSubStack, slot);
 }
 
-function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots) {
+function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, start) {
     return () => {
         table.removeEventListener('pointermove', moveCb);
 
@@ -45,7 +45,12 @@ function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots) 
         const availableOverlappingSlots = boundinRectsOfSlots.filter(predicate);
         const mostOverlappingSlot = findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved);
         const targetSlot = mostOverlappingSlot || originalSlot;
-        const dropCardCb = c => translateCard(dealersHand, targetSlot, c, table);
+        const end = Date.now();
+        const moveDuration = end - start;
+        const probablyDblclick = moveDuration < animationDuration && targetSlot === originalSlot;
+        const dropCardCb = probablyDblclick
+            ? c => targetSlot.append(c)
+            : c => translateCard(dealersHand, targetSlot, c, table);
 
         [...dealersHand.children].forEach(dropCardCb);
     };
