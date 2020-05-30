@@ -11,7 +11,7 @@ import scoreCounter from './score-counter.js';
 const checkForWin = () => {
     if (consumedSlots.length === 7) {
         scoreCounter.score += 1;
-        scoreDisplay.textContent = `${scoreCounter.score} times so far!`;
+        scoreDisplay.textContent = `${scoreCounter.score} time${scoreCounter.score === 1 ? '' : 's'} so far!`;
         winNotification.style.display = 'block';
     }
 };
