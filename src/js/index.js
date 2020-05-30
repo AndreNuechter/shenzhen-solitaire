@@ -18,7 +18,8 @@ import cards from './cards.js';
 Object.assign(dragonSummoningBtns, {
     onclick: summonDragons,
     onpointerdown: visualizeButtonClick,
-    onpointerup: visualizeButtonClick
+    onpointerup: visualizeButtonClick,
+    onpointerout: visualizeButtonClick
 });
 resetBtn.onclick = resetTable;
 table.addEventListener('pointerdown', moveCard, { passive: true });

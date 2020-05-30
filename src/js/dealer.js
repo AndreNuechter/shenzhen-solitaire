@@ -145,10 +145,11 @@ function summonDragons({ target }) {
     }
 }
 
-function visualizeButtonClick({ target }) {
+function visualizeButtonClick({ target, type }) {
     const btn = target.closest('.dragon-summoning-btn');
 
     if (!btn) return;
 
-    btn.classList.toggle('clicked');
+    if (['pointerout', 'pointerup'].includes(type)) btn.classList.remove('clicked');
+    else btn.classList.add('clicked');
 }
