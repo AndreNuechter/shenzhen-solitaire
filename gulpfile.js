@@ -13,7 +13,6 @@ const webpack = require('webpack-stream');
 const jeditor = require('gulp-json-editor');
 const webpackConfig = require('./webpack.config.js');
 
-const randomInt = (max, min) => Math.trunc(Math.random() * max) - min;
 const proverbs = [
     'At the gambling table, there are no fathers and sons.',
     'Reform a gambler. Cure leprosy.',
@@ -88,5 +87,5 @@ function serve() {
     app.use(express.static('src'));
     app.use(express.static(devDir));
     // eslint-disable-next-line no-console
-    app.listen(3000, () => console.log(proverbs[randomInt(proverbs.length - 1, 0)]));
+    app.listen(3000, () => console.log(proverbs[Math.trunc(Math.random() * proverbs.length)]));
 }
