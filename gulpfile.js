@@ -88,5 +88,5 @@ function serve() {
     app.use(express.static('src'));
     app.use(express.static(devDir));
     // eslint-disable-next-line no-console
-    app.listen(3000, () => console.log(proverbs[randomInt(proverbs.length, 0)]));
+    app.listen(3000, () => console.log(proverbs[randomInt(proverbs.length - 1, 0)]));
 }
