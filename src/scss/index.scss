@@ -1,5 +1,4 @@
 :root {
-    --border-color: rgba(122, 87, 119, 0.7);
     touch-action: none;
 
     * {
@@ -21,16 +20,6 @@ html {
     *::before,
     *::after {
         box-sizing: inherit;
-    }
-}
-
-#skull {
-    path {
-        fill-opacity: 0;
-    }
-
-    path.filled-path {
-        fill-opacity: 1;
     }
 }
 
@@ -58,7 +47,15 @@ g[data-color=""] {
     }
 }
 
-$upper-border-width: 8px;
+#skull {
+    path {
+        fill-opacity: 0;
+    }
+
+    path.filled-path {
+        fill-opacity: 1;
+    }
+}
 
 #win-notification {
     display: none;
@@ -70,15 +67,20 @@ $upper-border-width: 8px;
     background: gold;
     border: 3px solid red;
     user-select: none;
+    text-align: center;
 }
 
 #reset-btn {
     position: absolute;
     right: 0;
     bottom: 0;
-    background: black;
-    width: $upper-border-width * 3;
-    height: $upper-border-width;
+    width: 24px;
+    height: 8px;
+    text-align: center;
+    font-size: 0.4rem;
+    background: gold;
+    border: 1px solid red;
+    opacity: 0.7;
     cursor: pointer;
 }
 
@@ -138,6 +140,22 @@ $upper-border-width: 8px;
     }
 }
 
+.dragon-summoning-btn {
+    fill: url('#button');
+    stroke: grey;
+    stroke-width: 1;
+    cursor: pointer;
+
+    text {
+        stroke: none;
+        transform: translate(-7px, 7px);
+    }
+
+    &.clicked {
+        fill: url('#button-clicked');
+    }
+}
+
 @keyframes flip-over {
     0% {
         transform: scale(1, 1)translateX(0);
@@ -161,21 +179,5 @@ $upper-border-width: 8px;
     95%,
     100% {
         opacity: 0;
-    }
-}
-
-.dragon-summoning-btn {
-    fill: url('#button');
-    stroke: grey;
-    stroke-width: 1;
-    cursor: pointer;
-
-    text {
-        stroke: none;
-        transform: translate(-7px, 7px);
-    }
-
-    &.clicked {
-        fill: url('#button-clicked');
     }
 }
