@@ -19,7 +19,7 @@ const consumeSlotAndCheckForWin = (slot) => {
     slot.classList.add('consumed');
     checkForWin();
 };
-const stackCard = (node, offset) => node.setAttribute('transform', `translate(0,${offset * cardGap * 2})`);
+const stackCard = (card, offset) => card.setAttribute('transform', `translate(0,${offset * cardGap * 2})`);
 const basicAdditionHandler = ({ addedNodes: [card] }) => {
     card.removeAttribute('transform');
     card.classList.add('frozen');

@@ -137,21 +137,19 @@ function shuffleCards(deck) {
 }
 
 function translateCard(srcSlot, targetSlot, card, table) {
-    const cardTransforms = getTransforms(card);
-    const initialTransform = getTransforms(srcSlot);
-    const finalTransform = `${
+    const startPosition = getTransforms(srcSlot) + getTransforms(card);
+    const endPosition = `${
         getTransforms(targetSlot)
     }translateY(${
         (targetSlot.children.length - 1) * cardGap * 2 * Number(targetSlot.dataset.slotType === 'stacking')
     }px)`;
     // NOTE: disabling pointer-events to e.g. prevent cards being taken from below a returning stack
     const elements2BeFrozen = [srcSlot, targetSlot, card, dragonSummoningBtns];
-
     elements2BeFrozen.forEach((el) => { el.style.pointerEvents = 'none'; });
     table.append(card);
     card
         .animate({
-            transform: [cardTransforms + initialTransform, finalTransform],
+            transform: [startPosition, endPosition],
             easing: ['ease-in', 'ease-out']
         }, animationDuration)
         .addEventListener('finish', () => {

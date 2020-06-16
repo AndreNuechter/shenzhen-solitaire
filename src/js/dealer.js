@@ -39,6 +39,7 @@ function collectCard({ x, y }) {
     const srcSlot = card.parentElement;
 
     if (['flower', 'collection'].includes(srcSlot.dataset.slotType)) return;
+    // NOTE: dblclick should only move the last card of a stack
     if (srcSlot.lastChild !== card) return;
 
     const { color, value } = card.dataset;
@@ -48,6 +49,7 @@ function collectCard({ x, y }) {
     const targetSlot = (() => {
         if (!value) return flowerSlot;
 
+        const isDblclickTarget = value === '1'
             ? slot => slot.classList.contains('empty')
             : ({
                 lastChild: {
@@ -58,7 +60,7 @@ function collectCard({ x, y }) {
                 }
             }) => slottedCardColor === color && +slottedCardValue === (value - 1);
 
-        return collectionSlots.find(isDblclickableCard);
+        return collectionSlots.find(isDblclickTarget);
     })();
 
     if (targetSlot) {
