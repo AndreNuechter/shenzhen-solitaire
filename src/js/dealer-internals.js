@@ -108,8 +108,11 @@ function measureOverlap({
 }
 
 function moveCardCbFactory(x1, y1, srcSlotPos, scalingFactor, movedCards, dealersHand) {
-    return ({ x: x2, y: y2, isPrimary }) => {
-        if (!isPrimary) return;
+    return (event) => {
+        if (!event.isPrimary) return;
+
+        const x2 = event.x;
+        const y2 = event.y;
 
         if (!dealersHand.children.length) {
             dealersHand.append(...movedCards);
