@@ -48,8 +48,7 @@ function collectCard({ x, y }) {
     const targetSlot = (() => {
         if (!value) return flowerSlot;
 
-        const isDblclickableCard = value === '1'
-            ? slot => slot.children.length === 1
+            ? slot => slot.classList.contains('empty')
             : ({
                 lastChild: {
                     dataset: {
@@ -62,7 +61,10 @@ function collectCard({ x, y }) {
         return collectionSlots.find(isDblclickableCard);
     })();
 
-    if (targetSlot) translateCard(srcSlot, targetSlot, card, table);
+    if (targetSlot) {
+        targetSlot.classList.remove('empty');
+        translateCard(srcSlot, targetSlot, card, table);
+    }
 }
 
 function dealCards(deck) {
@@ -102,6 +104,7 @@ function resetTable() {
     winNotification.style.display = '';
     cardSlots.forEach(c => c.classList.remove('consumed'));
     cards.forEach(c => c.classList.remove('frozen'));
+    collectionSlots.forEach(c => c.classList.add('empty'));
     dealCards(cards);
 }
 
