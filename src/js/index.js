@@ -29,7 +29,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setScalingFactor();
     if ('serviceWorker' in window.navigator) {
         window.navigator.serviceWorker
-            .register('/service-worker.js');
+            .register('./service-worker.js');
     }
 }, { once: true });
 window.onresize = setScalingFactor;
