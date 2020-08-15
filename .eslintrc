@@ -20,6 +20,8 @@
         "document": false,
         "window": false,
         "localStorage": false,
-        "MutationObserver": false
+        "MutationObserver": false,
+        "self": false,
+        "fetch": false
     }
 }

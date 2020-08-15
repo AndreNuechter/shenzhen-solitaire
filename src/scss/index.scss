@@ -57,8 +57,8 @@ g[data-color=""] {
     }
 }
 
-#win-notification {
-    display: none;
+#win-notification,
+noscript {
     position: absolute;
     padding: 24px 16px;
     top: 50%;
@@ -68,6 +68,10 @@ g[data-color=""] {
     border: 3px solid red;
     user-select: none;
     text-align: center;
+}
+
+#win-notification {
+    display: none;
 }
 
 #reset-btn {
