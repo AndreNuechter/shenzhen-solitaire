@@ -5,5 +5,5 @@ export default new Proxy(scoreCounter, {
         Reflect.set(obj, key, val);
         localStorage.setItem('score', JSON.stringify(obj));
         return true;
-    }
+    },
 });

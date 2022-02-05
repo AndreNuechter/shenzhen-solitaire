@@ -2,7 +2,7 @@ const animationDuration = 500;
 const cardDefaults = {
     x: 0,
     y: 0,
-    rx: 5
+    rx: 5,
 };
 const cardGap = 8;
 const cardWidth = 128;
@@ -14,5 +14,5 @@ export {
     cardDefaults,
     cardGap,
     ns,
-    width
+    width,
 };

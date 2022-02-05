@@ -23,5 +23,5 @@ export {
     scoreDisplay,
     stackSlots,
     table,
-    winNotification
+    winNotification,
 };

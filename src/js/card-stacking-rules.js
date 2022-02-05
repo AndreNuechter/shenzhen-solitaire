@@ -4,11 +4,11 @@ export default {
     collection: ({ children: movedCards }, { children: collected }) => {
         const {
             color: movedColor,
-            value: movedValue
+            value: movedValue,
         } = movedCards[0].dataset;
         const {
             color: collectedColor,
-            value: collectedValue
+            value: collectedValue,
         } = collected[collected.length - 1].dataset;
 
         // only single cards may be added to a collection slot
@@ -22,11 +22,11 @@ export default {
     stacking: ({ children: [{ dataset: dataOfFirstMoved }] }, { children: stacked }) => {
         const {
             color: topStackedColor,
-            value: topStackedValue
+            value: topStackedValue,
         } = stacked[stacked.length - 1].dataset;
         const {
             color: bottomMovedColor,
-            value: bottomMovedValue
+            value: bottomMovedValue,
         } = dataOfFirstMoved;
 
         // an empty stacking-slot accepts any movable stack
@@ -35,5 +35,5 @@ export default {
         if (!(topStackedValue && bottomMovedValue)) return false;
         // else we enforce descending values and alternating colors
         return +bottomMovedValue === topStackedValue - 1 && bottomMovedColor !== topStackedColor;
-    }
+    },
 };

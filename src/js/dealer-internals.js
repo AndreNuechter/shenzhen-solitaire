@@ -3,8 +3,8 @@ import { dragonSummoningBtns } from './dom-selections.js';
 import stackRules from './card-stacking-rules.js';
 
 const replacerArgs = [/(\d)(,|\))/g, '$1px$2'];
-const getTransforms = el => el.getAttribute('transform').replace(...replacerArgs);
-const getRects = slot => [slot, slot.getBoundingClientRect()];
+const getTransforms = (el) => el.getAttribute('transform').replace(...replacerArgs);
+const getRects = (slot) => [slot, slot.getBoundingClientRect()];
 
 export {
     areOverlapping,
@@ -15,7 +15,7 @@ export {
     isOutOfOrder,
     moveCardCbFactory,
     shuffleCards,
-    translateCard
+    translateCard,
 };
 
 // https://stackoverflow.com/questions/12066870/how-to-check-if-an-element-is-overlapping-other-elements
@@ -49,8 +49,8 @@ function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, 
         const moveDuration = end - start;
         const probablyDblclick = moveDuration < animationDuration && targetSlot === originalSlot;
         const dropCardCb = probablyDblclick
-            ? c => targetSlot.append(c)
-            : c => translateCard(dealersHand, targetSlot, c, table);
+            ? (c) => targetSlot.append(c)
+            : (c) => translateCard(dealersHand, targetSlot, c, table);
 
         [...dealersHand.children].forEach(dropCardCb);
     };
@@ -62,7 +62,7 @@ function findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved)
     availableOverlappingSlots.forEach(([slot, boundingRectOfOverlapping]) => {
         const overlap = measureOverlap(
             boundingRectOfMoved,
-            boundingRectOfOverlapping
+            boundingRectOfOverlapping,
         );
 
         if (overlap > mostOverlapping.overlap) {
@@ -81,7 +81,7 @@ function isOutOfOrder({ dataset: { color: thisColor, value: thisValue } }, posit
     if (position === cardStack.length - 1) return false;
     const {
         color: nextColor,
-        value: nextValue
+        value: nextValue,
     } = cardStack[position + 1].dataset;
     return !nextValue || +nextValue !== thisValue - 1 || nextColor === thisColor;
 }
@@ -90,12 +90,12 @@ function measureOverlap({
     x: x1,
     y: y1,
     width: width1,
-    height: height1
+    height: height1,
 }, {
     x: x2,
     y: y2,
     width: width2,
-    height: height2
+    height: height2,
 }) {
     const [start, end] = (() => {
         if (x1 > x2 && y1 > y2) return [{ x: x1, y: y1 }, { x: x2 + width2, y: y2 + height2 }];
@@ -121,11 +121,10 @@ function moveCardCbFactory(x1, y1, srcSlotPos, scalingFactor, movedCards, dealer
         dealersHand
             .setAttribute('transform', `${srcSlotPos}${getTranslateString(
                 (x2 - x1) * scalingFactor,
-                (y2 - y1) * scalingFactor
+                (y2 - y1) * scalingFactor,
             )}`);
     };
 }
-
 
 function shuffleCards(deck) {
     // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -138,11 +137,10 @@ function shuffleCards(deck) {
 
 function translateCard(srcSlot, targetSlot, card, table) {
     const startPosition = getTransforms(srcSlot) + getTransforms(card);
-    const endPosition = `${
-        getTransforms(targetSlot)
-    }translateY(${
-        (targetSlot.children.length - 1) * cardGap * 2 * Number(targetSlot.dataset.slotType === 'stacking')
-    }px)`;
+    const verticalOffset = (targetSlot.children.length - 1) * cardGap * 2 * Number(
+        targetSlot.dataset.slotType === 'stacking',
+    );
+    const endPosition = `${getTransforms(targetSlot)}translateY(${verticalOffset}px)`;
     // NOTE: disabling pointer-events to e.g. prevent cards being taken from below a returning stack
     const elements2BeFrozen = [srcSlot, targetSlot, card, dragonSummoningBtns];
     elements2BeFrozen.forEach((el) => { el.style.pointerEvents = 'none'; });
@@ -150,10 +148,10 @@ function translateCard(srcSlot, targetSlot, card, table) {
     card
         .animate({
             transform: [startPosition, endPosition],
-            easing: ['ease-in', 'ease-out']
+            easing: ['ease-in', 'ease-out'],
         }, animationDuration)
         .addEventListener('finish', () => {
             targetSlot.append(card);
-            elements2BeFrozen.forEach(el => el.removeAttribute('style'));
+            elements2BeFrozen.forEach((el) => el.removeAttribute('style'));
         }, { once: true });
 }

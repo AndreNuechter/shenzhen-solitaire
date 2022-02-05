@@ -3,7 +3,7 @@ const exceptions = ['checked', 'textContent', 'data', 'onpointerdown', 'onpointe
 export {
     configClone,
     configElement,
-    indexOfNode
+    indexOfNode,
 };
 
 /**
@@ -12,7 +12,7 @@ export {
  * @returns { Function }
  */
 function configClone(template) {
-    return attrs => configElement(template.cloneNode(false), attrs);
+    return (attrs) => configElement(template.cloneNode(false), attrs);
 }
 
 /**

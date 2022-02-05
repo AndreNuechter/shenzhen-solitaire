@@ -6,14 +6,14 @@ import {
     flowerSlot,
     stackSlots,
     table,
-    winNotification
+    winNotification,
 } from './dom-selections.js';
 import {
     dropCardCbFactory,
     isOutOfOrder,
     moveCardCbFactory,
     shuffleCards,
-    translateCard
+    translateCard,
 } from './dealer-internals.js';
 import cards from './cards.js';
 import { indexOfNode } from './helper-functions.js';
@@ -28,7 +28,7 @@ export {
     resetTable,
     setScalingFactor,
     summonDragons,
-    visualizeButtonClick
+    visualizeButtonClick,
 };
 
 function collectCard({ x, y }) {
@@ -50,14 +50,14 @@ function collectCard({ x, y }) {
         if (!value) return flowerSlot;
 
         const isDblclickTarget = value === '1'
-            ? slot => slot.classList.contains('empty')
+            ? (slot) => slot.classList.contains('empty')
             : ({
                 lastChild: {
                     dataset: {
                         color: slottedCardColor,
-                        value: slottedCardValue
-                    }
-                }
+                        value: slottedCardValue,
+                    },
+                },
             }) => slottedCardColor === color && +slottedCardValue === (value - 1);
 
         return collectionSlots.find(isDblclickTarget);
@@ -98,15 +98,16 @@ function moveCard({ target, x: x1, y: y1 }) {
     table.addEventListener('pointermove', moveCb, { passive: true });
     table.addEventListener(
         'pointerup',
-        dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, start), { once: true }
+        dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, start),
+        { once: true },
     );
 }
 
 function resetTable() {
     winNotification.style.display = '';
-    cardSlots.forEach(c => c.classList.remove('consumed'));
-    cards.forEach(c => c.classList.remove('frozen'));
-    collectionSlots.forEach(c => c.classList.add('empty'));
+    cardSlots.forEach((c) => c.classList.remove('consumed'));
+    cards.forEach((c) => c.classList.remove('frozen'));
+    collectionSlots.forEach((c) => c.classList.add('empty'));
     dealCards(cards);
 }
 
@@ -123,7 +124,7 @@ function summonDragons({ target }) {
     const reducer = (arr, { children: slottedCards }) => {
         const {
             color: cardColor,
-            value
+            value,
         } = slottedCards[slottedCards.length - 1].dataset;
 
         if (cardColor === btnColor && !value) {
@@ -143,7 +144,7 @@ function summonDragons({ target }) {
             d.classList.add('frozen');
             setTimeout(
                 () => translateCard(d.parentElement, freeDragonSlot, d, table),
-                25 * i
+                25 * i,
             );
         };
         dragons.forEach(cb);

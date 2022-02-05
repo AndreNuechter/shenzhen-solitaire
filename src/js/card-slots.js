@@ -2,7 +2,7 @@ import {
     cardSlots,
     consumedSlots,
     scoreDisplay,
-    winNotification
+    winNotification,
 } from './dom-selections.js';
 import { cardGap } from './constants.js';
 import { indexOfNode } from './helper-functions.js';
@@ -25,37 +25,37 @@ const basicAdditionHandler = ({ addedNodes: [card] }) => {
     card.classList.add('frozen');
 };
 const observers = {
-    collection: slot => (mutations) => {
+    collection: (slot) => (mutations) => {
         if (mutations[0].addedNodes.length) mutations.forEach(basicAdditionHandler);
         if (slot.children.length === 10) {
             consumeSlotAndCheckForWin(slot);
         }
     },
-    dragon: slot => (mutations) => {
+    dragon: (slot) => (mutations) => {
         const additionHandler = ({ addedNodes: addedCards }) => {
-            addedCards.forEach(card => stackCard(card, 0));
+            addedCards.forEach((card) => stackCard(card, 0));
         };
         if (mutations[0].addedNodes.length) mutations.forEach(additionHandler);
         if (slot.children.length > 2) {
             consumeSlotAndCheckForWin(slot);
         }
     },
-    flower: slot => (mutations) => {
+    flower: (slot) => (mutations) => {
         if (mutations[0].addedNodes.length) {
             mutations.forEach(basicAdditionHandler);
             consumeSlotAndCheckForWin(slot);
         }
     },
-    stacking: slot => (mutations) => {
+    stacking: (slot) => (mutations) => {
         mutations.forEach(({ addedNodes: addedCards }) => {
             addedCards.forEach((card) => {
                 stackCard(
                     card,
-                    indexOfNode(slot.children, card) - 1
+                    indexOfNode(slot.children, card) - 1,
                 );
             });
         });
-    }
+    },
 };
 
 cardSlots.forEach((slot) => {

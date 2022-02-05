@@ -2,7 +2,7 @@ import {
     group,
     rect,
     text,
-    use
+    use,
 } from './dom-creations.js';
 import { configClone } from './helper-functions.js';
 
@@ -11,7 +11,7 @@ const symbols = {
     black: '#war',
     green: '#biohazard',
     dragon: '#skull',
-    flower: '#flower'
+    flower: '#flower',
 };
 const cardFaceTmpl = (id, color, value) => {
     const wrapper = group.cloneNode(false);
@@ -20,31 +20,31 @@ const cardFaceTmpl = (id, color, value) => {
         height: '16px',
         href: id,
         stroke: color,
-        fill: color
+        fill: color,
     });
     const topCornerIcon = configClone(icon)({
         x: '4px',
-        y: '4px'
+        y: '4px',
     });
     const bottomCornerIcon = configClone(icon)({
         x: '109px',
-        y: '160px'
+        y: '160px',
     });
     const centerIcon = configClone(icon)({
         x: '32px',
         y: '60px',
         width: '64px',
-        height: '64px'
+        height: '64px',
     });
     const topCornerText = configClone(text)({
         x: '24px',
         y: '16px',
-        textContent: value
+        textContent: value,
     });
     const bottomCornerText = configClone(text)({
         x: '96px',
         y: '173px',
-        textContent: value
+        textContent: value,
     });
 
     wrapper.append(topCornerIcon, bottomCornerIcon, centerIcon, topCornerText, bottomCornerText);
@@ -52,7 +52,7 @@ const cardFaceTmpl = (id, color, value) => {
 };
 const cardTemplate = (color, value) => {
     const card = configClone(group)({
-        class: 'card'
+        class: 'card',
     });
     const cardBoard = rect.cloneNode(false);
     const cardFace = (() => {
@@ -71,9 +71,11 @@ const cardTemplate = (color, value) => {
 };
 // NOTE: values 1-9 are for normal cards, dragons have no value and the flower has neither color nor value
 const cards = ['black', 'red', 'green']
-    .flatMap(color => Array
-        .from({ length: 13 },
-            (_, i) => cardTemplate(color, i <= 8 ? i + 1 : '')));
+    .flatMap((color) => Array
+        .from(
+            { length: 13 },
+            (_, i) => cardTemplate(color, i <= 8 ? i + 1 : ''),
+        ));
 cards.push(cardTemplate('', ''));
 
 export default cards;

@@ -1,3 +1,4 @@
+import './wakelock.js';
 import {
     collectCard,
     dealCards,
@@ -5,13 +6,13 @@ import {
     resetTable,
     setScalingFactor,
     summonDragons,
-    visualizeButtonClick
+    visualizeButtonClick,
 } from './dealer.js';
 import {
     dragonSummoningBtns,
     resetBtn,
     table,
-    winNotification
+    winNotification,
 } from './dom-selections.js';
 import cards from './cards.js';
 
@@ -19,7 +20,7 @@ Object.assign(dragonSummoningBtns, {
     onclick: summonDragons,
     onpointerdown: visualizeButtonClick,
     onpointerup: visualizeButtonClick,
-    onpointerout: visualizeButtonClick
+    onpointerout: visualizeButtonClick,
 });
 resetBtn.onclick = resetTable;
 table.addEventListener('pointerdown', moveCard, { passive: true });

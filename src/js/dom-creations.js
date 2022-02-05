@@ -10,5 +10,5 @@ export {
     group,
     rect,
     text,
-    use
+    use,
 };
