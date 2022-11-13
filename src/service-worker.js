@@ -4,13 +4,13 @@ const appName = 'shenzhen-solitaire';
 const appVersion = '<APP_VERSION>';
 const cacheName = `${appName}-r${appVersion}`;
 
-window.self.addEventListener('activate', (event) => {
+self.addEventListener('activate', (event) => {
     event.waitUntil(
         (async () => {
-            const keys = await window.self.caches.keys();
+            const keys = await self.caches.keys();
             return Promise.all(keys.map((key) => {
                 if (key.includes(appName) && key !== cacheName) {
-                    return window.self.caches.delete(key);
+                    return self.caches.delete(key);
                 }
                 return true;
             }));
@@ -18,14 +18,14 @@ window.self.addEventListener('activate', (event) => {
     );
 });
 
-window.self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', (event) => {
     event.respondWith(
         (async () => {
-            let response = await window.self.caches.match(event.request);
+            let response = await self.caches.match(event.request);
             // NOTE: we disable caching during dev, by checking if appVersion has been replaced
             if (response && appVersion.contains('<APP_VERSION')) return response;
             response = await fetch(event.request);
-            const cache = await window.self.caches.open(cacheName);
+            const cache = await self.caches.open(cacheName);
             cache.put(event.request, response.clone());
             return response;
         })(),
