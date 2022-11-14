@@ -23,7 +23,7 @@ self.addEventListener('fetch', (event) => {
         (async () => {
             let response = await self.caches.match(event.request);
             // NOTE: we disable caching during dev, by checking if appVersion has been replaced
-            if (response && appVersion.contains('<APP_VERSION')) return response;
+            if (response && appVersion.includes('<APP_VERSION')) return response;
             response = await fetch(event.request);
             const cache = await self.caches.open(cacheName);
             cache.put(event.request, response.clone());
