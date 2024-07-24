@@ -36,21 +36,23 @@ function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, 
     return () => {
         table.removeEventListener('pointermove', moveCb);
 
-        if (!dealersHand.children.length) return;
+        if (dealersHand.children.length === 0) return;
 
         const boundinRectsOfSlots = cardSlots.map(getRects);
         const boundingRectOfMoved = dealersHand.getBoundingClientRect();
-        const predicate = ([slot, rect]) => areOverlapping(boundingRectOfMoved, rect)
-            && canBeMovedHere(dealersHand, slot);
-        const availableOverlappingSlots = boundinRectsOfSlots.filter(predicate);
+        const availableOverlappingSlots = boundinRectsOfSlots
+            .filter(
+                ([slot, rect]) => areOverlapping(boundingRectOfMoved, rect)
+                    && canBeMovedHere(dealersHand, slot),
+            );
         const mostOverlappingSlot = findMostOverlappingSlot(availableOverlappingSlots, boundingRectOfMoved);
         const targetSlot = mostOverlappingSlot || originalSlot;
         const end = Date.now();
         const moveDuration = end - start;
         const probablyDblclick = moveDuration < animationDuration && targetSlot === originalSlot;
         const dropCardCb = probablyDblclick
-            ? (c) => targetSlot.append(c)
-            : (c) => translateCard(dealersHand, targetSlot, c, table);
+            ? (card) => targetSlot.append(card)
+            : (card) => translateCard(dealersHand, targetSlot, card, table);
 
         [...dealersHand.children].forEach(dropCardCb);
     };
@@ -79,10 +81,12 @@ function getTranslateString(x, y) {
 
 function isOutOfOrder({ dataset: { color: thisColor, value: thisValue } }, position, cardStack) {
     if (position === cardStack.length - 1) return false;
+
     const {
         color: nextColor,
         value: nextValue,
     } = cardStack[position + 1].dataset;
+
     return !nextValue || +nextValue !== thisValue - 1 || nextColor === thisColor;
 }
 
@@ -143,6 +147,7 @@ function translateCard(srcSlot, targetSlot, card, table) {
     const endPosition = `${getTransforms(targetSlot)}translateY(${verticalOffset}px)`;
     // NOTE: disabling pointer-events to e.g. prevent cards being taken from below a returning stack
     const elements2BeFrozen = [srcSlot, targetSlot, card, dragonSummoningBtns];
+
     elements2BeFrozen.forEach((el) => { el.style.pointerEvents = 'none'; });
     table.append(card);
     card

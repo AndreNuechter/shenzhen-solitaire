@@ -112,7 +112,7 @@ function resetTable() {
 }
 
 function setScalingFactor() {
-    scalingFactor = +((width / table.clientWidth)).toFixed(2);
+    scalingFactor = +(width / table.clientWidth).toFixed(2);
 }
 
 function summonDragons({ target }) {
@@ -121,7 +121,7 @@ function summonDragons({ target }) {
     if (!btn) return;
 
     const { color: btnColor } = btn.dataset;
-    const reducer = (arr, { children: slottedCards }) => {
+    const dragons = [...stackSlots, ...dragonSlots].reduce((arr, { children: slottedCards }) => {
         const {
             color: cardColor,
             value,
@@ -132,22 +132,21 @@ function summonDragons({ target }) {
         }
 
         return arr;
-    };
+    }, []);
     // NOTE: we consider a slot free if it's empty or has an appropriately colored dragon already
-    const predicate = ({ children }) => children.length === 1
-        || (!children[1].dataset.value && children[1].dataset.color === btnColor);
-    const dragons = [...stackSlots, ...dragonSlots].reduce(reducer, []);
-    const freeDragonSlot = dragonSlots.find(predicate);
+    const freeDragonSlot = dragonSlots.find(
+        ({ children }) => children.length === 1
+        || (!children[1].dataset.value && children[1].dataset.color === btnColor),
+    );
 
     if (dragons.length === 4 && freeDragonSlot) {
-        const cb = (d, i) => {
-            d.classList.add('frozen');
+        dragons.forEach((dragon, index) => {
+            dragon.classList.add('frozen');
             setTimeout(
-                () => translateCard(d.parentElement, freeDragonSlot, d, table),
-                25 * i,
+                () => translateCard(dragon.parentElement, freeDragonSlot, dragon, table),
+                25 * index,
             );
-        };
-        dragons.forEach(cb);
+        });
     }
 }
 
@@ -156,6 +155,9 @@ function visualizeButtonClick({ target, type }) {
 
     if (!btn) return;
 
-    if (['pointerout', 'pointerup'].includes(type)) btn.classList.remove('clicked');
-    else btn.classList.add('clicked');
+    btn.classList[
+        ['pointerout', 'pointerup'].includes(type)
+            ? 'remove'
+            : 'add'
+    ]('clicked');
 }

@@ -87,9 +87,10 @@ function serve() {
     const app = express();
     app.use(express.static('src'));
     app.use(express.static(devDir));
-    // eslint-disable-next-line no-console
-    app.listen(PORT, () => console.log(
-        proverbs[Math.trunc(Math.random() * proverbs.length)],
-        `/localhost:${PORT}`,
-    ));
+    app.listen(PORT, () => {
+        // eslint-disable-next-line no-console
+        console.log(proverbs[Math.trunc(Math.random() * proverbs.length)]);
+        // eslint-disable-next-line no-console
+        console.log(`http://localhost:${PORT}`);
+    });
 }
