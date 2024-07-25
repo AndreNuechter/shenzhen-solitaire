@@ -12,7 +12,7 @@
     }],
     "start_url": "/",
     "background_color": "forestgreen",
-    "display": "standalone",
+    "display": "fullscreen",
     "orientation": "landscape",
     "theme_color": "gold"
 }

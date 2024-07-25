@@ -66,7 +66,7 @@ function js() {
 }
 
 function pwaAssets() {
-    src('src/images/*.png')
+    src('src/images/*.png', { encoding: false })
         .pipe(dest(`${deployDir}images`));
     return src('src/manifest.json')
         .pipe(jeditor((json) => {
