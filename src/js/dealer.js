@@ -94,6 +94,9 @@ function moveCard({ target, x: x1, y: y1 }) {
     const start = Date.now();
     const moveCb = moveCardCbFactory(x1, y1, posOfOriginalSlot, scalingFactor, movedCards, dealersHand);
 
+    // prevent card being moved under a card-stack returning to its origin
+    originalSlot.classList.add('busy');
+
     dealersHand.setAttribute('transform', posOfOriginalSlot);
     table.addEventListener('pointermove', moveCb, { passive: true });
     table.addEventListener(

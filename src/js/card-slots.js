@@ -32,10 +32,11 @@ const observers = {
         }
     },
     dragon: (slot) => (mutations) => {
-        const additionHandler = ({ addedNodes: addedCards }) => {
-            addedCards.forEach((card) => stackCard(card, 0));
-        };
-        if (mutations[0].addedNodes.length) mutations.forEach(additionHandler);
+        if (mutations[0].addedNodes.length) {
+            mutations.forEach(({ addedNodes: addedCards }) => {
+                addedCards.forEach((card) => stackCard(card, 0));
+            });
+        }
         if (slot.children.length > 2) {
             consumeSlotAndCheckForWin(slot);
         }

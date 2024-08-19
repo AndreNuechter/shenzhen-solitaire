@@ -55,6 +55,8 @@ function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, 
             : (card) => translateCard(dealersHand, targetSlot, card, table);
 
         [...dealersHand.children].forEach(dropCardCb);
+
+        setTimeout(() => originalSlot.classList.remove('busy'), animationDuration);
     };
 }
 
@@ -139,14 +141,14 @@ function shuffleCards(deck) {
     return deck;
 }
 
-function translateCard(srcSlot, targetSlot, card, table) {
-    const startPosition = getTransforms(srcSlot) + getTransforms(card);
+function translateCard(cardContainer, targetSlot, card, table) {
+    const startPosition = getTransforms(cardContainer) + getTransforms(card);
     const verticalOffset = (targetSlot.children.length - 1) * cardGap * 2 * Number(
         targetSlot.dataset.slotType === 'stacking',
     );
     const endPosition = `${getTransforms(targetSlot)}translateY(${verticalOffset}px)`;
     // NOTE: disabling pointer-events to e.g. prevent cards being taken from below a returning stack
-    const elements2BeFrozen = [srcSlot, targetSlot, card, dragonSummoningBtns];
+    const elements2BeFrozen = [cardContainer, targetSlot, card, dragonSummoningBtns];
 
     elements2BeFrozen.forEach((el) => { el.style.pointerEvents = 'none'; });
     table.append(card);

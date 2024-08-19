@@ -1,5 +1,7 @@
 export default {
-    dragon: (movedSubStack, slot) => movedSubStack.children.length === 1 && slot.children.length === 1,
+    dragon: (movedSubStack, slot) => !slot.classList.contains('busy')
+        && movedSubStack.children.length === 1
+        && slot.children.length === 1,
     flower: ({ children: [{ dataset: { color, value } }] }) => !(Boolean(value) || Boolean(color)),
     collection: ({ children: movedCards }, { children: collected }) => {
         // only single cards may be added to a collection slot
@@ -22,7 +24,12 @@ export default {
         // a non-empty slot only takes cards of the same color, valued one higher than the top card
         return +movedValue === +collectedValue + 1 && movedColor === collectedColor;
     },
-    stacking: ({ children: [{ dataset: dataOfFirstMoved }] }, { children: stacked }) => {
+    stacking: ({ children: [{ dataset: dataOfFirstMoved }] }, slot) => {
+        // prevent a card being moved under a returning stack
+        if (slot.classList.contains('busy')) return false;
+
+        const stacked = slot.children;
+
         // an empty stacking-slot accepts any movable stack
         if (stacked.length === 1) return true;
 
