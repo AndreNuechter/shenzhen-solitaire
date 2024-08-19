@@ -36,7 +36,10 @@ function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, 
     return () => {
         table.removeEventListener('pointermove', moveCb);
 
-        if (dealersHand.children.length === 0) return;
+        if (dealersHand.children.length === 0) {
+            originalSlot.classList.remove('busy');
+            return;
+        }
 
         const boundinRectsOfSlots = cardSlots.map(getRects);
         const boundingRectOfMoved = dealersHand.getBoundingClientRect();
