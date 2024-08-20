@@ -94,9 +94,6 @@ function moveCard({ target, x: x1, y: y1 }) {
     const start = Date.now();
     const moveCb = moveCardCbFactory(x1, y1, posOfOriginalSlot, scalingFactor, movedCards, dealersHand);
 
-    // prevent card being moved under a card-stack returning to its origin
-    originalSlot.classList.add('busy');
-
     dealersHand.setAttribute('transform', posOfOriginalSlot);
     table.addEventListener('pointermove', moveCb, { passive: true });
     table.addEventListener(
@@ -108,9 +105,9 @@ function moveCard({ target, x: x1, y: y1 }) {
 
 function resetTable() {
     winNotification.style.display = '';
-    cardSlots.forEach((c) => c.classList.remove('consumed'));
-    cards.forEach((c) => c.classList.remove('frozen'));
-    collectionSlots.forEach((c) => c.classList.add('empty'));
+    cards.forEach((card) => card.classList.remove('frozen'));
+    cardSlots.forEach((slot) => slot.classList.remove('consumed'));
+    collectionSlots.forEach((slot) => slot.classList.add('empty'));
     dealCards(cards);
 }
 
@@ -136,13 +133,16 @@ function summonDragons({ target }) {
 
         return arr;
     }, []);
+
+    if (dragons.length !== 4) return;
+
     // NOTE: we consider a slot free if it's empty or has an appropriately colored dragon already
     const freeDragonSlot = dragonSlots.find(
         ({ children }) => children.length === 1
-        || (!children[1].dataset.value && children[1].dataset.color === btnColor),
+            || (!children[1].dataset.value && children[1].dataset.color === btnColor),
     );
 
-    if (dragons.length === 4 && freeDragonSlot) {
+    if (freeDragonSlot) {
         dragons.forEach((dragon, index) => {
             dragon.classList.add('frozen');
             setTimeout(

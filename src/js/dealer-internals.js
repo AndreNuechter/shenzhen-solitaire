@@ -33,6 +33,9 @@ function canBeMovedHere(movedSubStack, slot) {
 }
 
 function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, start) {
+    // prevent card being moved under a card-stack returning to its origin
+    originalSlot.classList.add('busy');
+
     return () => {
         table.removeEventListener('pointermove', moveCb);
 
@@ -117,15 +120,12 @@ function measureOverlap({
 }
 
 function moveCardCbFactory(x1, y1, srcSlotPos, scalingFactor, movedCards, dealersHand) {
-    return (event) => {
-        if (!event.isPrimary) return;
+    if (dealersHand.children.length === 0) {
+        dealersHand.append(...movedCards);
+    }
 
-        const x2 = event.x;
-        const y2 = event.y;
-
-        if (!dealersHand.children.length) {
-            dealersHand.append(...movedCards);
-        }
+    return ({ isPrimary, x: x2, y: y2 }) => {
+        if (!isPrimary) return;
 
         dealersHand
             .setAttribute('transform', `${srcSlotPos}${getTranslateString(
@@ -144,6 +144,8 @@ function shuffleCards(deck) {
     return deck;
 }
 
+// TODO it'd be nice if a stack added/returned to a stacking-slot would not collapse before addition
+// TODO a constant animationDuration kinda sucks (especially for short distances)
 function translateCard(cardContainer, targetSlot, card, table) {
     const startPosition = getTransforms(cardContainer) + getTransforms(card);
     const verticalOffset = (targetSlot.children.length - 1) * cardGap * 2 * Number(

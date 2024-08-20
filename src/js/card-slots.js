@@ -9,11 +9,11 @@ import { indexOfNode } from './helper-functions.js';
 import scoreCounter from './score-counter.js';
 
 const checkForWin = () => {
-    if (consumedSlots.length === 7) {
-        scoreCounter.score += 1;
-        scoreDisplay.textContent = `${scoreCounter.score} time${scoreCounter.score === 1 ? '' : 's'} so far!`;
-        winNotification.style.display = 'block';
-    }
+    if (consumedSlots.length !== 7) return;
+
+    scoreCounter.score += 1;
+    scoreDisplay.textContent = `${scoreCounter.score} time${scoreCounter.score === 1 ? '' : 's'} so far!`;
+    winNotification.style.display = 'block';
 };
 const consumeSlotAndCheckForWin = (slot) => {
     slot.classList.add('consumed');
