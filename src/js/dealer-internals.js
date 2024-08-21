@@ -155,6 +155,8 @@ function translateCard(cardContainer, targetSlot, card, table) {
     // NOTE: disabling pointer-events to e.g. prevent cards being taken from below a returning stack
     const elements2BeFrozen = [cardContainer, targetSlot, card, dragonSummoningBtns];
 
+    // prevent user adding two 1s to a collection slot (eg by hovering the 1st over the slot, dropping it and dblclicking the 2nd before the animation is finished)
+    targetSlot.classList.remove('empty');
     elements2BeFrozen.forEach((el) => { el.style.pointerEvents = 'none'; });
     table.append(card);
     card

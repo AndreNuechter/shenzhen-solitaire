@@ -3,9 +3,11 @@ export default {
         && movedSubStack.children.length === 1
         && slot.children.length === 1,
     flower: ({ children: [{ dataset: { color, value } }] }) => !(Boolean(value) || Boolean(color)),
-    collection: ({ children: movedCards }, { children: collected }) => {
+    collection: ({ children: movedCards }, { children: collected, classList }) => {
         // only single cards may be added to a collection slot
         if (movedCards.length !== 1) return false;
+        // prevent collecting two 1s in the same slot
+        if (!classList.contains('empty')) return false;
 
         const {
             color: movedColor,
