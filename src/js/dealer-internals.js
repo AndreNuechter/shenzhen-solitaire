@@ -60,9 +60,15 @@ function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, 
             ? (card) => targetSlot.append(card)
             : (card) => translateCard(dealersHand, targetSlot, card, table);
 
+        // prevent over-addition to empty stacking-slot
+        targetSlot.classList.add('busy');
+
         [...dealersHand.children].forEach(dropCardCb);
 
-        setTimeout(() => originalSlot.classList.remove('busy'), animationDuration);
+        setTimeout(() => {
+            originalSlot.classList.remove('busy');
+            targetSlot.classList.remove('busy');
+        }, animationDuration);
     };
 }
 
@@ -120,9 +126,7 @@ function measureOverlap({
 }
 
 function moveCardCbFactory(x1, y1, srcSlotPos, scalingFactor, movedCards, dealersHand) {
-    if (dealersHand.children.length === 0) {
-        dealersHand.append(...movedCards);
-    }
+    dealersHand.append(...movedCards);
 
     return ({ isPrimary, x: x2, y: y2 }) => {
         if (!isPrimary) return;
