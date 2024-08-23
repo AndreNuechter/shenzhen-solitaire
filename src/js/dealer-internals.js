@@ -59,6 +59,9 @@ function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, 
         const dropCardCb = probablyDblclick
             ? (card) => targetSlot.append(card)
             : (card) => translateCard(dealersHand, targetSlot, card, table);
+        const dropDuration = probablyDblclick
+            ? 0
+            : animationDuration;
 
         // prevent over-addition to empty stacking-slot
         targetSlot.classList.add('busy');
@@ -68,7 +71,7 @@ function dropCardCbFactory(moveCb, originalSlot, table, dealersHand, cardSlots, 
         setTimeout(() => {
             originalSlot.classList.remove('busy');
             targetSlot.classList.remove('busy');
-        }, animationDuration);
+        }, dropDuration);
     };
 }
 
