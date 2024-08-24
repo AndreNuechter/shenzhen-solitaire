@@ -7,7 +7,7 @@ export default {
         // only single cards may be added to a collection slot
         if (movedCards.length !== 1) return false;
         // prevent collecting two 1s in the same slot
-        if (!classList.contains('empty')) return false;
+        if (collected.length === 1 && !classList.contains('empty')) return false;
 
         const {
             color: movedColor,
