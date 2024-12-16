@@ -12,8 +12,8 @@
     "devDependencies": {
         "eslint": "^8.x",
         "eslint-config-airbnb-base": "^15.0.0",
-        "eslint-plugin-import": "^2.29.1",
-        "express": "^4.19.2",
+        "eslint-plugin-import": "^2.30.0",
+        "express": "^5.0.0",
         "gulp": "^5.0.0",
         "gulp-csso": "^4.0.1",
         "gulp-html-replace": "^1.6.2",
@@ -23,7 +23,7 @@
         "string-replace-loader": "^3.1.0",
         "webpack-stream": "^7.0.0",
         "node-sass": "^9.0.0",
-        "webpack": "^5.93.0"
+        "webpack": "^5.95.0"
     },
     "scripts": {
         "dev": "gulp",

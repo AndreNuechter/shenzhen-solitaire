@@ -16,6 +16,10 @@ import {
 } from './dom-selections.js';
 import cards from './cards.js';
 
+// FIXME cache is broken...maybe sth. w how the service-worker is now compiled?!
+// BUG consumed dragons and flower continue showing face (in chrome)
+// TODO persist game on pageclose
+
 Object.assign(dragonSummoningBtns, {
     onclick: summonDragons,
     onpointerdown: visualizeButtonClick,

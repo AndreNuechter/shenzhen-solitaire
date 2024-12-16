@@ -138,7 +138,14 @@ noscript {
 
             text,
             g {
-                animation: fade .2s ease 1 forwards;
+                // FIXME in chrome this is not working anymore (maybe it's a bug in chrome)...on mobile face disappears only after another card has been moved on desktop it's just broken
+                // animation: fade .2s ease 1 forwards;
+                animation-name: fade;
+                animation-duration: .2s;
+                animation-timing-function: ease;
+                animation-iteration-count: 1;
+                animation-direction: normal;
+                animation-fill-mode: forwards;
             }
         }
     }
@@ -180,8 +187,7 @@ noscript {
         opacity: 1;
     }
 
-    95%,
-    100% {
+    95% {
         opacity: 0;
     }
 }
