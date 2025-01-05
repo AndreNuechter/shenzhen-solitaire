@@ -1,13 +1,14 @@
 - const cardWidth = 128;
 - const cardHeight = 178;
 - const cardGap = 8;
+- const cardSlotCount = 8;
 - const circleRadius = 24;
 -
     const viewBox = {
-        x: -cardGap,
-        y: -cardGap,
-        width: (cardWidth + cardGap) * 8 + cardGap,
-        get height() { return Math.ceil((this.width / 16) * 10); }
+        x: -cardGap * 2,
+        y: -cardGap * 2,
+        width: (cardWidth + cardGap) * cardSlotCount + cardGap * 3,
+        get height() { return Math.ceil((this.width / (cardSlotCount * 2)) * 10); }
     };
 
 noscript Without JavaScript, this will not work.
@@ -16,7 +17,7 @@ noscript Without JavaScript, this will not work.
 #win-notification
     span Congratulations, you have won.
     #score-display
-svg#table(preserveAspectRatio="xMinYMax meet" viewBox=`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`)
+svg#table(preserveAspectRatio="xMinYMax slice" viewBox=`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`)
     rect#table-cover(x=viewBox.x y=viewBox.y width=viewBox.width height=viewBox.height filter="url(#texture)" fill="none")
 
     each _, i in new Array(3)
