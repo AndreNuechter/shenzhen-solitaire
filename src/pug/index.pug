@@ -10,61 +10,45 @@
         get height() { return Math.ceil((this.width / 16) * 10); }
     };
 
-doctype html
-html(lang="en")
-    head
-        meta(charset="UTF-8")
-        meta(name="viewport" content="width=device-width, initial-scale=1")
-        meta(http-equiv="X-UA-Compatible" content="ie=edge")
-        meta(name="description" content="A version of the popular card-game.")
-        meta(name="theme-color" content="gold")
-        link(rel="icon" type="image/png" href="./images/icons-192.png")
-        link(rel="manifest" href="./manifest.json")
-        link(rel="stylesheet" href="css/index.css")
-        // build:js
-        script(src="js/index.js" type="module")
-        script(src="js/card-slots.js" type="module")
-        // endbuild
-        title Shenzhen Solitaire
-    body
-        noscript Without JavaScript, this will not work.
-        #reset-btn(title="Reset table") Reset
-        #win-notification
-            span Congratulations, you have won.
-            #score-display
-        svg#table(preserveAspectRatio="xMinYMax meet" viewBox=`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`)
-            rect#table-cover(x=viewBox.x y=viewBox.y width=viewBox.width height=viewBox.height filter="url(#texture)" fill="none")
+noscript Without JavaScript, this will not work.
+#reset-btn(title="Reset table") Reset
+#proverb-container
+#win-notification
+    span Congratulations, you have won.
+    #score-display
+svg#table(preserveAspectRatio="xMinYMax meet" viewBox=`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`)
+    rect#table-cover(x=viewBox.x y=viewBox.y width=viewBox.width height=viewBox.height filter="url(#texture)" fill="none")
 
-            each _, i in new Array(3)
-                g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},0)` data-slot-type="dragon")
-                    rect(x=0 y=0 rx=5 class="slot-outline")
-            
-            g#dragon-summoning-btns(transform=`translate(${(cardWidth + cardGap) * 3 + cardGap},${circleRadius + cardGap})`)
-                each color, i in ['black', 'green', 'red']
-                    g.dragon-summoning-btn(data-color=color)
-                        circle(
-                            cx=circleRadius 
-                            cy=((circleRadius * 2 + cardGap) * i) 
-                            r=circleRadius)
-                        use(href='#skull'
-                            fill=color
-                            stroke=color
-                            x=10
-                            y=((circleRadius * 2 + cardGap) * i) - 12
-                            width=28
-                            height=28)
+    each _, i in new Array(3)
+        g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},0)` data-slot-type="dragon")
+            rect(x=0 y=0 rx=5 class="slot-outline")
+    
+    g#dragon-summoning-btns(transform=`translate(${(cardWidth + cardGap) * 3 + cardGap},${circleRadius + cardGap})`)
+        each color, i in ['black', 'green', 'red']
+            g.dragon-summoning-btn(data-color=color)
+                circle(
+                    cx=circleRadius
+                    cy=((circleRadius * 2 + cardGap) * i)
+                    r=circleRadius)
+                use(href='#skull'
+                    fill=color
+                    stroke=color
+                    x=10
+                    y=((circleRadius * 2 + cardGap) * i) - 12
+                    width=28
+                    height=28)
 
-            g.card-slot(transform=`translate(${(cardWidth + cardGap) * 3.5},0)` data-slot-type="flower")
-                rect(x=0 y=0 rx=5 class="slot-outline")
+    g.card-slot(transform=`translate(${(cardWidth + cardGap) * 3.5},0)` data-slot-type="flower")
+        rect(x=0 y=0 rx=5 class="slot-outline")
 
-            each _, i in new Array(3)
-                g.card-slot.empty(transform=`translate(${(cardWidth + cardGap) * (i + 5)},0)` data-slot-type="collection")
-                    rect(x=0 y=0 rx=5 class="slot-outline")
+    each _, i in new Array(3)
+        g.card-slot.empty(transform=`translate(${(cardWidth + cardGap) * (i + 5)},0)` data-slot-type="collection")
+            rect(x=0 y=0 rx=5 class="slot-outline")
 
-            each _, i in new Array(8)
-                g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap})` data-slot-type="stacking")
-                    rect(x=0 y=0 rx=5 class="slot-outline")
+    each _, i in new Array(8)
+        g.card-slot(transform=`translate(${(cardWidth + cardGap) * i},${cardHeight + cardGap})` data-slot-type="stacking")
+            rect(x=0 y=0 rx=5 class="slot-outline")
 
-            g#dealers-hand
+    g#dealers-hand
 
-        include defs.pug
+include defs.pug

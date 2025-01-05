@@ -1,4 +1,6 @@
-import './wakelock.js';
+import './service-worker/service-worker-init.js';
+import './service-worker/wakelock.js';
+import './card-slots.js';
 import {
     collectCard,
     dealCards,
@@ -32,10 +34,6 @@ winNotification.onclick = () => resetBtn.click();
 window.addEventListener('DOMContentLoaded', () => {
     dealCards(cards);
     setScalingFactor();
-    if ('serviceWorker' in window.navigator) {
-        window.navigator.serviceWorker
-            .register('./service-worker.js');
-    }
 }, { once: true });
 window.onresize = setScalingFactor;
 window.ondblclick = collectCard;
