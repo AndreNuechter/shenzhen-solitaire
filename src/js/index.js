@@ -33,10 +33,15 @@ Object.assign(dragonSummoningBtns, {
 resetBtn.onclick = resetTable;
 table.addEventListener('pointerdown', moveCard, { passive: true });
 winNotification.onclick = () => resetBtn.click();
+proverbContainer.onclick = () => { proverbContainer.style.display = ''; };
 window.addEventListener('DOMContentLoaded', () => {
+    // show a random gambling related quote on start
     proverbContainer.textContent = proverbs[Math.trunc(Math.random() * proverbs.length)];
     proverbContainer.style.display = 'block';
-    setTimeout(() => { proverbContainer.style.display = ''; }, 3e3);
+    proverbContainer.classList.add('fade');
+    setTimeout(() => {
+        proverbContainer.style.display = '';
+    }, 5e3);
     dealCards(cards);
     setScalingFactor();
 }, { once: true });

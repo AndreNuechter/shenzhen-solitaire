@@ -76,6 +76,10 @@ noscript {
     display: none;
 }
 
+#proverb-container.fade {
+    animation: fade 5s ease-in 1 forwards;
+}
+
 #reset-btn {
     position: absolute;
     right: 12px;
