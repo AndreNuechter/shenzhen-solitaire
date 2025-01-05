@@ -5,6 +5,7 @@ const dealersHand = document.getElementById('dealers-hand');
 const dragonSlots = [...document.querySelectorAll('[data-slot-type="dragon"]')];
 const dragonSummoningBtns = document.getElementById('dragon-summoning-btns');
 const flowerSlot = document.querySelector('[data-slot-type="flower"]');
+const proverbContainer = document.getElementById('proverb-container');
 const resetBtn = document.getElementById('reset-btn');
 const scoreDisplay = document.getElementById('score-display');
 const stackSlots = [...document.querySelectorAll('[data-slot-type="stacking"]')];
@@ -19,6 +20,7 @@ export {
     dragonSlots,
     dragonSummoningBtns,
     flowerSlot,
+    proverbContainer,
     resetBtn,
     scoreDisplay,
     stackSlots,
