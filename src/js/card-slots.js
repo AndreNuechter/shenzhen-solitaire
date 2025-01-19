@@ -17,6 +17,10 @@ const checkForWin = () => {
 };
 const consumeSlotAndCheckForWin = (slot) => {
     slot.classList.add('consumed');
+    // NOTE: in chrome, dragon and flower cards continue showing face after they've been flipped, until the next user interaction and reading innerWidth should force the browser to re-render instantly
+    // c. https://gist.github.com/paulirish/5d52fb081b3570c81e3a
+    // eslint-disable-next-line no-unused-expressions
+    window.innerWidth;
     checkForWin();
 };
 const stackCard = (card, offset) => card.setAttribute('transform', `translate(0,${offset * cardGap * 2})`);

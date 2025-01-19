@@ -20,30 +20,30 @@ import {
 import cards from './cards.js';
 import proverbs from './proverbs.js';
 
-// FIXME cache is broken...maybe sth. w how the service-worker is now compiled?!
-// BUG consumed dragons and flower continue showing face (in chrome)
 // TODO persist game on pageclose
+// FIXME dblclick doesnt collect in chrome desktop
 
+window.addEventListener('DOMContentLoaded', () => {
+    // show a random gambling related quote on start
+    proverbContainer.textContent = proverbs[Math.trunc(Math.random() * proverbs.length)];
+    proverbContainer.style.display = 'block';
+    proverbContainer.classList.add('fade');
+    setTimeout(hideProverbContainer, 5e3);
+    // set up the table
+    dealCards(cards);
+    setScalingFactor();
+}, { once: true });
+window.addEventListener('resize', setScalingFactor);
+window.addEventListener('dblclick', collectCard);
+resetBtn.addEventListener('click', resetTable);
+table.addEventListener('pointerdown', moveCard, { passive: true });
+winNotification.addEventListener('click', resetTable);
+proverbContainer.addEventListener('click', hideProverbContainer);
 Object.assign(dragonSummoningBtns, {
     onclick: summonDragons,
     onpointerdown: visualizeButtonClick,
     onpointerup: visualizeButtonClick,
     onpointerout: visualizeButtonClick,
 });
-resetBtn.onclick = resetTable;
-table.addEventListener('pointerdown', moveCard, { passive: true });
-winNotification.onclick = () => resetBtn.click();
-proverbContainer.onclick = () => { proverbContainer.style.display = ''; };
-window.addEventListener('DOMContentLoaded', () => {
-    // show a random gambling related quote on start
-    proverbContainer.textContent = proverbs[Math.trunc(Math.random() * proverbs.length)];
-    proverbContainer.style.display = 'block';
-    proverbContainer.classList.add('fade');
-    setTimeout(() => {
-        proverbContainer.style.display = '';
-    }, 5e3);
-    dealCards(cards);
-    setScalingFactor();
-}, { once: true });
-window.onresize = setScalingFactor;
-window.ondblclick = collectCard;
+
+function hideProverbContainer() { proverbContainer.style.display = ''; }
