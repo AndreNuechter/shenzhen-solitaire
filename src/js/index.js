@@ -38,7 +38,7 @@ window.addEventListener('dblclick', collectCard);
 resetBtn.addEventListener('click', resetTable);
 table.addEventListener('pointerdown', moveCard, { passive: true });
 winNotification.addEventListener('click', resetTable);
-proverbContainer.addEventListener('click', hideProverbContainer);
+window.addEventListener('click', hideProverbContainer, { once: true });
 Object.assign(dragonSummoningBtns, {
     onclick: summonDragons,
     onpointerdown: visualizeButtonClick,
