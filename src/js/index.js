@@ -21,7 +21,7 @@ import cards from './cards.js';
 import proverbs from './proverbs.js';
 
 // TODO persist game on pageclose
-// FIXME dblclick doesnt collect in chrome desktop
+// FIXME dblclick doesnt collect a card in chrome desktop
 
 window.addEventListener('DOMContentLoaded', () => {
     // show a random gambling related quote on start
@@ -35,10 +35,10 @@ window.addEventListener('DOMContentLoaded', () => {
 }, { once: true });
 window.addEventListener('resize', setScalingFactor);
 window.addEventListener('dblclick', collectCard);
+window.addEventListener('click', hideProverbContainer, { once: true });
 resetBtn.addEventListener('click', resetTable);
 table.addEventListener('pointerdown', moveCard, { passive: true });
 winNotification.addEventListener('click', resetTable);
-window.addEventListener('click', hideProverbContainer, { once: true });
 Object.assign(dragonSummoningBtns, {
     onclick: summonDragons,
     onpointerdown: visualizeButtonClick,
@@ -46,4 +46,6 @@ Object.assign(dragonSummoningBtns, {
     onpointerout: visualizeButtonClick,
 });
 
-function hideProverbContainer() { proverbContainer.style.display = ''; }
+function hideProverbContainer() {
+    proverbContainer.style.display = '';
+}

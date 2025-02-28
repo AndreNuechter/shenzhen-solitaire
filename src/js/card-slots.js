@@ -1,10 +1,10 @@
+import { animationDuration, cardGap } from './constants.js';
 import {
     cardSlots,
     consumedSlots,
     scoreDisplay,
     winNotification,
 } from './dom-selections.js';
-import { cardGap } from './constants.js';
 import { indexOfNode } from './helper-functions.js';
 import scoreCounter from './score-counter.js';
 
@@ -20,7 +20,7 @@ const consumeSlotAndCheckForWin = (slot) => {
     // NOTE: in chrome, dragon and flower cards continue showing face after they've been flipped, until the next user interaction and reading innerWidth should force the browser to re-render instantly
     // c. https://gist.github.com/paulirish/5d52fb081b3570c81e3a
     // eslint-disable-next-line no-self-assign
-    window.innerWidth = window.innerWidth;
+    setTimeout(() => { window.innerWidth = window.innerWidth; }, animationDuration);
     checkForWin();
 };
 const stackCard = (card, offset) => card.setAttribute('transform', `translate(0,${offset * cardGap * 2})`);
