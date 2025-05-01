@@ -138,14 +138,13 @@ noscript {
         height: 178px;
     }
 
-    &.consumed {
-        .card.frozen {
-            animation: flip-over .5s ease 1 forwards;
+    &.consumed .frozen {
+        animation: flip-over .5s ease 1 forwards;
 
-            text,
-            g {
-                animation: fade .2s ease 1 forwards;
-            }
+        text,
+        g {
+            animation: fade .2s ease 1 forwards;
+            animation-delay: .05s;
         }
     }
 }
